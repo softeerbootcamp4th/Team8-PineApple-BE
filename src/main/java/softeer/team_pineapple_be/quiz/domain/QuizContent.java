@@ -5,13 +5,16 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
+/**
+ * QuizContent의 엔티티 타입
+ */
 @Entity
 @Getter
 public class QuizContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     private String quizDescription;

@@ -14,5 +14,10 @@ import java.time.LocalDate;
 @Repository
 public interface QuizContentRepository extends JpaRepository<QuizContent, Integer> {
 
+    /**
+     * 날짜를 기준으로 DB에서 조회하는 메서드
+     * @param quizDate 조회하고자 하는 날짜
+     * @return 조회된 QuizContent
+     */
     QuizContent findByQuizDate(LocalDate quizDate);
 }
