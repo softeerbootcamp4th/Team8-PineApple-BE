@@ -1,0 +1,17 @@
+spring.application.name: team_pineapple_be
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/softeer
+    username: root
+    password: 1234
+
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+    groups-order: desc
+    path: /api-docs
+  paths-to-match:
+    - /**
