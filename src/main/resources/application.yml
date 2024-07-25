@@ -4,8 +4,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/softeer
-    username: root
-    password: 1234
+  config:
+    import: application-secret.yml
 
 springdoc:
   swagger-ui:
@@ -15,3 +15,4 @@ springdoc:
     path: /api-docs
   paths-to-match:
     - /**
+
