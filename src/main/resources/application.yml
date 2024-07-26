@@ -16,3 +16,7 @@ springdoc:
   paths-to-match:
     - /**
 
+server:
+  servlet:
+    session:
+      timeout: 172800
