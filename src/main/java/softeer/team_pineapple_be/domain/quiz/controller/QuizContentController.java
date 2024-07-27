@@ -1,12 +1,12 @@
-package softeer.team_pineapple_be.quiz.controller;
+package softeer.team_pineapple_be.domain.quiz.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import softeer.team_pineapple_be.quiz.response.QuizContentResponse;
-import softeer.team_pineapple_be.quiz.service.QuizContentService;
+import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
+import softeer.team_pineapple_be.domain.quiz.service.QuizContentService;
 
 @Tag(name = "Quiz Content 제공", description = "날짜에 대한 퀴즈 정보를 제공하는 API")
 @RestController

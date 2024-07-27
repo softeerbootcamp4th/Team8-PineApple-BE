@@ -1,9 +1,9 @@
-package softeer.team_pineapple_be.quiz.response;
+package softeer.team_pineapple_be.domain.quiz.response;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import softeer.team_pineapple_be.quiz.domain.QuizContent;
+import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
 
 /**
  * QuizContent의 응답을 구성하는 클래스

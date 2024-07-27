@@ -1,10 +1,10 @@
-package softeer.team_pineapple_be.quiz.service;
+package softeer.team_pineapple_be.domain.quiz.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import softeer.team_pineapple_be.quiz.domain.QuizContent;
-import softeer.team_pineapple_be.quiz.repository.QuizContentRepository;
-import softeer.team_pineapple_be.quiz.response.QuizContentResponse;
+import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
+import softeer.team_pineapple_be.domain.quiz.repository.QuizContentRepository;
+import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 
 import java.time.LocalDate;
 

@@ -1,4 +1,4 @@
-package softeer.team_pineapple_be.quiz.domain;
+package softeer.team_pineapple_be.domain.quiz.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

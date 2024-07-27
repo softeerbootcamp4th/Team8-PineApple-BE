@@ -1,8 +1,8 @@
-package softeer.team_pineapple_be.quiz.repository;
+package softeer.team_pineapple_be.domain.quiz.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import softeer.team_pineapple_be.quiz.domain.QuizContent;
+import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
 
 import java.time.LocalDate;
 
