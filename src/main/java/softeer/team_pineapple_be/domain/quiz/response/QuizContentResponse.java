@@ -12,6 +12,7 @@ import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
 @Getter
 public class QuizContentResponse {
 
+    private Integer id;
     private String quizDescription;
     private String quizQuesion1;
     private String quizQuesion2;
@@ -25,6 +26,7 @@ public class QuizContentResponse {
      */
     public static QuizContentResponse quizContentResponse(QuizContent quizContent){
         return new QuizContentResponse(
+                quizContent.getId(),
                 quizContent.getQuizDescription(),
                 quizContent.getQuizQuestion1(),
                 quizContent.getQuizQuestion2(),
