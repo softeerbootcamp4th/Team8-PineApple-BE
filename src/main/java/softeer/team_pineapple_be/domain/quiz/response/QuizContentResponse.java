@@ -24,7 +24,7 @@ public class QuizContentResponse {
      * @param quizContent 변환하고자 하는 QuizContent
      * @return 응답 형식에 맞는 QuizContent
      */
-    public static QuizContentResponse quizContentResponse(QuizContent quizContent){
+    public static QuizContentResponse of(QuizContent quizContent){
         return new QuizContentResponse(
                 quizContent.getId(),
                 quizContent.getQuizDescription(),
