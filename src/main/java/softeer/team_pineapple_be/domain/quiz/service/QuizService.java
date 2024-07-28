@@ -11,6 +11,7 @@ import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 //TODO: 예외처리(구조 맞추기 위해 남겨둠)
@@ -33,11 +34,8 @@ public class QuizService {
      * @return 정답 안내 정보에 대한 내용
      */
     public QuizInfoResponse quizIsCorrect(QuizInfoRequest quizInfoRequest) {
-        Optional<QuizInfo> optionalQuizInfo = quizInfoRepository.findById(quizInfoRequest.getQuizId());
-        if (optionalQuizInfo.isEmpty()) {
-            // TODO: 퀴즈 존재 안 하면 예외처리
-        }
-        QuizInfo quizInfo = optionalQuizInfo.get();
+        QuizInfo quizInfo = quizInfoRepository.findById(quizInfoRequest.getQuizId())
+                .orElseThrow(NoSuchElementException::new);
         if(quizInfoRequest.getAnswerNum().equals(quizInfo.getAnswerNum())){
             return QuizInfoResponse.of(quizInfo, true);
         }
