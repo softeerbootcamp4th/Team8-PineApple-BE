@@ -29,4 +29,8 @@ public class Member {
     toolBoxCnt = 0;
     car = false;
   }
+
+  public void incrementToolBoxCnt() {
+    this.toolBoxCnt += 1;
+  }
 }
