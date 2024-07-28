@@ -2,11 +2,13 @@ package softeer.team_pineapple_be.domain.quiz.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softeer.team_pineapple_be.domain.quiz.request.QuizInfoRequest;
 import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
+import softeer.team_pineapple_be.domain.quiz.response.QuizHistoryResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.service.QuizService;
 
@@ -29,4 +31,13 @@ public class QuizController {
     public ResponseEntity<QuizInfoResponse> isCorrect(@RequestBody QuizInfoRequest quizInfoRequest) {
         return ResponseEntity.ok().body(quizService.quizIsCorrect(quizInfoRequest));
     }
+
+    @Operation(summary = "퀴즈 참여 여부 등록")
+    @GetMapping("/participants")
+    public ResponseEntity<QuizHistoryResponse> setQuizInfo(HttpServletRequest request){
+        String phoneNumber = (String) request.getSession().getAttribute("phoneNumber");
+        System.out.println(phoneNumber);
+        return ResponseEntity.ok().body(quizService.quizHistory(phoneNumber));
+    }
+
 }
