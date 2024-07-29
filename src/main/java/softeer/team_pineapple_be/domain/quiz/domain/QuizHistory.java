@@ -20,15 +20,16 @@ public class QuizHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDate participantDate;
+    @ManyToOne
+    @JoinColumn(name = "quiz_content_id", nullable = false)
+    private QuizContent quizContent;
 
     @ManyToOne
     @JoinColumn(name = "phone_number", nullable = false)
     private Member member;
 
-    public QuizHistory(Member member) {
+    public QuizHistory(Member member, QuizContent quizContent) {
         this.member = member;
-        this.participantDate = LocalDate.now(); // 현재 날짜로 설정
+        this.quizContent = quizContent;
     }
 }

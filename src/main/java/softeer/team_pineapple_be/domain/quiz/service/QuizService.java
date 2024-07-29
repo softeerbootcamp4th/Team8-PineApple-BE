@@ -17,6 +17,7 @@ import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.NoSuchElementException;
 
 //TODO: 예외처리(구조 맞추기 위해 남겨둠)
@@ -55,8 +56,8 @@ public class QuizService {
      * @return 현재 날짜의 이벤트 내용
      */
     @Transactional
-    public QuizContentResponse quizContent() {
-        QuizContent quizContent = quizContentRepository.findByQuizDate(LocalDate.now());
+    public QuizContentResponse getQuizContent() {
+        QuizContent quizContent = quizContentRepository.findByQuizDate(determineQuizDate());
         return QuizContentResponse.of(quizContent);
     }
 
@@ -67,15 +68,26 @@ public class QuizService {
      */
     @Transactional
     public MemberInfoResponse quizHistory(String phoneNumber) {
-        quizHistoryRepository.findByMemberPhoneNumberAndParticipantDate(phoneNumber, LocalDate.now())
+        QuizContent quizContent = quizContentRepository.findByQuizDate(determineQuizDate());
+        quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())
                 .ifPresent(quizHistory -> {
                     throw new NoSuchElementException("Quiz history already exists for phone number: " + phoneNumber);
                 });
         Member member = memberRepository.findByPhoneNumber(phoneNumber);
         member.incrementToolBoxCnt();
         memberRepository.save(member);
-        QuizHistory quizHistory = new QuizHistory(member);
+        QuizHistory quizHistory = new QuizHistory(member, quizContent);
         quizHistoryRepository.save(quizHistory);
         return MemberInfoResponse.of(member);
+    }
+
+    private LocalDate determineQuizDate() {
+        LocalTime twoPm = LocalTime.of(14, 0);
+        // 현재 시간이 2시 이전인지 확인
+        if (LocalTime.now().isBefore(twoPm)) {
+            return LocalDate.now().minusDays(1);
+        } else {
+            return LocalDate.now();
+        }
     }
 }

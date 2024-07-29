@@ -13,8 +13,6 @@ public class QuizInfoResponse {
 
     private Boolean isCorrect;
     private String quizImage;
-    private String quizDescription;
-    private String answerContent;
 
     /**
      * QuizInfo의 엔티티를 응답 형식으로 변환하는 메서드
@@ -25,8 +23,6 @@ public class QuizInfoResponse {
     public static QuizInfoResponse of(QuizInfo quizInfo, Boolean isCorrect){
         return new QuizInfoResponse(
                 isCorrect,
-                quizInfo.getQuizImage(),
-                quizInfo.getQuizDescription(),
-                quizInfo.getAnswerContent());
+                quizInfo.getQuizImage());
     }
 }

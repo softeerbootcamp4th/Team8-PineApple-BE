@@ -23,7 +23,7 @@ public class QuizController {
     @Operation(summary = "퀴즈 내용 가져오기")
     @GetMapping
     public ResponseEntity<QuizContentResponse> getQuizContent() {
-        return ResponseEntity.ok().body(quizService.quizContent());
+        return ResponseEntity.ok().body(quizService.getQuizContent());
     }
 
     @Operation(summary = "퀴즈 정답 맞추기")
