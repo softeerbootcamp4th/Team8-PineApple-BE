@@ -32,4 +32,11 @@ public class Member {
   public void incrementToolBoxCnt() {
     this.toolBoxCnt += 1;
   }
+
+  /**
+   * 월드컵 참여 기록
+   */
+  public void generateCar() {
+    this.car = true;
+  }
 }
