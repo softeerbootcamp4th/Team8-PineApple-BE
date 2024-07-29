@@ -3,7 +3,6 @@ package softeer.team_pineapple_be.domain.member.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,5 +27,12 @@ public class Member {
     this.phoneNumber = phoneNumber;
     toolBoxCnt = 0;
     car = false;
+  }
+
+  /**
+   * 월드컵 참여 기록
+   */
+  public void generateCar() {
+    this.car = true;
   }
 }

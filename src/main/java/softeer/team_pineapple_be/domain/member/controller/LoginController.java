@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -18,20 +19,21 @@ import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 /**
  * 로그인 컨트롤러
  */
+@Tag(name = "인증 API", description = "인증 처리")
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
   public final MemberAuthorizationService memberAuthorizationService;
 
-  
-  @Tag(name = "인증 API", description = "인증 처리")
+
+  @Operation(summary = "핸드폰 번호 입력해서 인증번호 받기")
   @PostMapping("/login/phone")
   public ResponseEntity<SuccessResponse> loginPhone(@RequestBody LoginPhoneNumberRequest loginPhoneNumberRequest) {
     memberAuthorizationService.loginWithPhoneNumber(loginPhoneNumberRequest.getPhoneNumber());
     return ResponseEntity.ok(new SuccessResponse());
   }
 
-  @Tag(name = "인증 API")
+  @Operation(summary = "인증번호 입력해서 인증")
   @PostMapping("/login/code")
   public ResponseEntity<MemberInfoResponse> loginWithAuthCode(@RequestBody LoginAuthCodeRequest loginAuthCodeRequest,
       HttpServletRequest request) {
@@ -43,7 +45,7 @@ public class LoginController {
     return ResponseEntity.ok(memberInfoResponse);
   }
 
-  @Tag(name = "인증 API")
+  @Operation(summary = "로그아웃")
   @PostMapping("/logout")
   public ResponseEntity<SuccessResponse> logout(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
