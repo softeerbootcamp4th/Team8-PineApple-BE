@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 
-import java.time.LocalDate;
-
 // TODO: id빼고, 복합키로 사용하면 성능에 어떤 일이 생길까?
 /**
  * QuizHistory의 엔티티 타입
