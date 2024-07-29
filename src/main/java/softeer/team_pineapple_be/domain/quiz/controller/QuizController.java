@@ -6,9 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.request.QuizInfoRequest;
 import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
-import softeer.team_pineapple_be.domain.quiz.response.QuizHistoryResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.service.QuizService;
 
@@ -34,9 +34,8 @@ public class QuizController {
 
     @Operation(summary = "퀴즈 참여 여부 등록")
     @GetMapping("/participants")
-    public ResponseEntity<QuizHistoryResponse> setQuizInfo(HttpServletRequest request){
+    public ResponseEntity<MemberInfoResponse> setQuizHistory(HttpServletRequest request){
         String phoneNumber = (String) request.getSession().getAttribute("phoneNumber");
-        System.out.println(phoneNumber);
         return ResponseEntity.ok().body(quizService.quizHistory(phoneNumber));
     }
 
