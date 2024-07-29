@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
+import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizHistory;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizInfo;
@@ -67,16 +68,16 @@ public class QuizService {
      * @return 참여 여부가 등록된 사용자의 툴박스 개수
      */
     @Transactional
-    public QuizHistoryResponse quizHistory(String phoneNumber) {
-        QuizHistory quizHistory = quizHistoryRepository.findByMemberPhoneNumberAndParticipantDate(phoneNumber, LocalDate.now());
-        if(quizHistory != null){
-            return null;
-        }
+    public MemberInfoResponse quizHistory(String phoneNumber) {
+        quizHistoryRepository.findByMemberPhoneNumberAndParticipantDate(phoneNumber, LocalDate.now())
+                .ifPresent(quizHistory -> {
+                    throw new NoSuchElementException("Quiz history already exists for phone number: " + phoneNumber);
+                });
         Member member = memberRepository.findByPhoneNumber(phoneNumber);
         member.incrementToolBoxCnt();
         memberRepository.save(member);
-        quizHistory = new QuizHistory(member);
+        QuizHistory quizHistory = new QuizHistory(member);
         quizHistoryRepository.save(quizHistory);
-        return QuizHistoryResponse.of(member);
+        return MemberInfoResponse.of(member);
     }
 }
