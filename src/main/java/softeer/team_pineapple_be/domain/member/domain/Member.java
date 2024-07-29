@@ -29,6 +29,10 @@ public class Member {
     car = false;
   }
 
+  public void incrementToolBoxCnt() {
+    this.toolBoxCnt += 1;
+  }
+
   /**
    * 월드컵 참여 기록
    */

@@ -27,9 +27,4 @@ public class QuizInfo {
     @Column(nullable = false)
     private String quizImage;
 
-    @Column(nullable = false)
-    private String quizDescription;
-
-    @Column(nullable = false)
-    private String answerContent;
 }
