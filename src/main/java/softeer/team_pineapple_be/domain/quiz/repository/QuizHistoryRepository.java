@@ -5,6 +5,7 @@ import softeer.team_pineapple_be.domain.quiz.domain.QuizHistory;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 //TODO: QueryDSL로 리팩토링
 /**
@@ -12,5 +13,5 @@ import java.util.List;
  */
 public interface QuizHistoryRepository extends JpaRepository<QuizHistory, Long> {
     List<QuizHistory> findByMemberPhoneNumber(String phoneNumber);
-    QuizHistory findByMemberPhoneNumberAndParticipantDate(String phoneNumber, LocalDate participantDate);
+    Optional<QuizHistory> findByMemberPhoneNumberAndParticipantDate(String phoneNumber, LocalDate participantDate);
 }
