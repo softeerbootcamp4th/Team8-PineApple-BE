@@ -14,12 +14,10 @@ import softeer.team_pineapple_be.domain.quiz.repository.QuizHistoryRepository;
 import softeer.team_pineapple_be.domain.quiz.repository.QuizInfoRepository;
 import softeer.team_pineapple_be.domain.quiz.request.QuizInfoRequest;
 import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
-import softeer.team_pineapple_be.domain.quiz.response.QuizHistoryResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 //TODO: 예외처리(구조 맞추기 위해 남겨둠)
 
