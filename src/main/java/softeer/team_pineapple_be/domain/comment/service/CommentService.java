@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,8 +14,11 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import softeer.team_pineapple_be.domain.comment.domain.Comment;
+import softeer.team_pineapple_be.domain.comment.domain.CommentLike;
+import softeer.team_pineapple_be.domain.comment.domain.id.LikeId;
 import softeer.team_pineapple_be.domain.comment.repository.CommentLikeRepository;
 import softeer.team_pineapple_be.domain.comment.repository.CommentRepository;
+import softeer.team_pineapple_be.domain.comment.request.CommentLikeRequest;
 import softeer.team_pineapple_be.domain.comment.request.CommentRequest;
 import softeer.team_pineapple_be.domain.comment.response.CommentPageResponse;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
@@ -61,6 +65,7 @@ public class CommentService {
    *
    * @param commentRequest
    */
+  @Transactional
   public void saveComment(CommentRequest commentRequest) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
     if (wasMemberCommentedToday(memberPhoneNumber)) {
@@ -68,6 +73,21 @@ public class CommentService {
       return;
     }
     commentRepository.save(new Comment(commentRequest.getContent(), memberPhoneNumber));
+  }
+
+  @Transactional
+  public void saveCommentLike(CommentLikeRequest commentLikeRequest) {
+    String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
+    LikeId likeId = new LikeId(commentLikeRequest.getCommentId(), memberPhoneNumber);
+    Optional<CommentLike> byId = commentLikeRepository.findById(likeId);
+    if (byId.isPresent()) {
+      //TODO: 이미 좋아요 누름 예외처리
+      return;
+    }
+    Comment comment = commentRepository.findById(commentLikeRequest.getCommentId())
+                                       .orElseThrow(() -> new RuntimeException("이후 처리합시다"));
+    comment.increaseLikeCount();
+    commentLikeRepository.save(new CommentLike(likeId));
   }
 
   /**
