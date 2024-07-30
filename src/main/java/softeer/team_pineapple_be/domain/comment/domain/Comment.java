@@ -29,4 +29,11 @@ public class Comment {
   private Integer likeCount;
   @Column(nullable = false)
   private LocalDateTime postTime;
+
+  public Comment(String content, String phoneNumber) {
+    this.content = content;
+    this.phoneNumber = phoneNumber;
+    likeCount = 0;
+    postTime = LocalDateTime.now();
+  }
 }
