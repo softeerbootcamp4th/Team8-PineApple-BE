@@ -20,9 +20,9 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final CommentLikeRepository commentLikeRepository;
 
-  //TODO : 좋아요 기능 구현
   public CommentPageResponse getCommentsSortedByLikes(int page) {
-    Page<Comment> commentPage = commentRepository.findAll(PageRequest.of(page, 10));
+    Page<Comment> commentPage =
+        commentRepository.findAll(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "likeCount")));
     return CommentPageResponse.fromCommentPage(commentPage);
   }
 
