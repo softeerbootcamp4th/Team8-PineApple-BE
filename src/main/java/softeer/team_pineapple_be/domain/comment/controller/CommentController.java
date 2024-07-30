@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import softeer.team_pineapple_be.domain.comment.request.CommentLikeRequest;
 import softeer.team_pineapple_be.domain.comment.request.CommentRequest;
 import softeer.team_pineapple_be.domain.comment.response.CommentPageResponse;
 import softeer.team_pineapple_be.domain.comment.service.CommentService;
@@ -26,6 +27,12 @@ public class CommentController {
   @PostMapping
   public ResponseEntity<SuccessResponse> addComment(@RequestBody CommentRequest commentRequest) {
     commentService.saveComment(commentRequest);
+    return ResponseEntity.ok(new SuccessResponse());
+  }
+
+  @PostMapping("/likes")
+  public ResponseEntity<SuccessResponse> addLikes(@RequestBody CommentLikeRequest commentLikeRequest) {
+    commentService.saveCommentLike(commentLikeRequest);
     return ResponseEntity.ok(new SuccessResponse());
   }
 
