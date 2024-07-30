@@ -14,13 +14,14 @@ import softeer.team_pineapple_be.domain.comment.domain.Comment;
 @Setter
 @AllArgsConstructor
 public class CommentResponse {
+  private Long id;
   private String phoneNumber;
   private String content;
   private Integer likeCount;
   private LocalDateTime postTime;
 
   public static CommentResponse fromComment(Comment comment) {
-    return new CommentResponse(comment.getPhoneNumber(), comment.getContent(), comment.getLikeCount(),
+    return new CommentResponse(comment.getId(), comment.getPhoneNumber(), comment.getContent(), comment.getLikeCount(),
         comment.getPostTime());
   }
 }
