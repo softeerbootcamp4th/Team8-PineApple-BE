@@ -42,9 +42,10 @@ public class CommentService {
    * @param page
    * @return 좋아요 순 정렬 기대평 목록
    */
-  public CommentPageResponse getCommentsSortedByLikes(int page) {
+  public CommentPageResponse getCommentsSortedByLikes(int page, LocalDate date) {
+    PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "likeCount"));
     Page<Comment> commentPage =
-        commentRepository.findAll(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "likeCount")));
+        commentRepository.findAllByPostTimeBetween(pageRequest, date.atStartOfDay(), date.atTime(LocalTime.MAX));
     return CommentPageResponse.fromCommentPage(commentPage);
   }
 
@@ -54,9 +55,10 @@ public class CommentService {
    * @param page
    * @return 최신순 정렬 기대평 목록
    */
-  public CommentPageResponse getCommentsSortedByRecent(int page) {
+  public CommentPageResponse getCommentsSortedByRecent(int page, LocalDate date) {
     PageRequest commentRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postTime"));
-    Page<Comment> commentPage = commentRepository.findAll(commentRequest);
+    Page<Comment> commentPage =
+        commentRepository.findAllByPostTimeBetween(commentRequest, date.atStartOfDay(), date.atTime(LocalTime.MAX));
     return CommentPageResponse.fromCommentPage(commentPage);
   }
 
