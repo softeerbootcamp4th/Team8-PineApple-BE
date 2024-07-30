@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.comment.request.CommentLikeRequest;
 import softeer.team_pineapple_be.domain.comment.request.CommentRequest;
@@ -39,11 +41,11 @@ public class CommentController {
   @GetMapping
   public ResponseEntity<CommentPageResponse> getComments(
       @RequestParam(required = false, defaultValue = "0") Integer page,
-      @RequestParam(required = false, defaultValue = "") String sort) {
+      @RequestParam(required = false, defaultValue = "") String sort, @RequestParam(required = true) LocalDate date) {
     if (sort.equals("like")) {
-      return ResponseEntity.ok(commentService.getCommentsSortedByLikes(page));
+      return ResponseEntity.ok(commentService.getCommentsSortedByLikes(page, date));
     } else {
-      return ResponseEntity.ok(commentService.getCommentsSortedByRecent(page));
+      return ResponseEntity.ok(commentService.getCommentsSortedByRecent(page, date));
     }
   }
 }
