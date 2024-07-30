@@ -22,9 +22,11 @@ public class Comment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Column(nullable = false)
-  private Long memberId;
+  private String phoneNumber;
   @Column(nullable = false)
   private String content;
   @Column(nullable = false)
-  private LocalDateTime createdDate;
+  private Integer likeCount;
+  @Column(nullable = false)
+  private LocalDateTime postTime;
 }
