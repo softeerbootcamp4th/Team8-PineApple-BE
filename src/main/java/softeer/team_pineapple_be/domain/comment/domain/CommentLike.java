@@ -2,6 +2,7 @@ package softeer.team_pineapple_be.domain.comment.domain;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import softeer.team_pineapple_be.domain.comment.domain.id.LikeId;
@@ -12,6 +13,7 @@ import softeer.team_pineapple_be.domain.comment.domain.id.LikeId;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CommentLike {
   @EmbeddedId
   private LikeId id;
