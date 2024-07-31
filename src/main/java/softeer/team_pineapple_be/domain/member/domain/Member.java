@@ -29,8 +29,8 @@ public class Member {
     car = false;
   }
 
-  public void incrementToolBoxCnt() {
-    this.toolBoxCnt += 1;
+  public void decrementToolBoxCnt() {
+    this.toolBoxCnt -= 1;
   }
 
   /**
@@ -38,5 +38,9 @@ public class Member {
    */
   public void generateCar() {
     this.car = true;
+  }
+
+  public void incrementToolBoxCnt() {
+    this.toolBoxCnt += 1;
   }
 }

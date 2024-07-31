@@ -11,7 +11,11 @@ import lombok.experimental.UtilityClass;
 public class RandomUtils {
   private static final SecureRandom secureRandom = new SecureRandom();
 
-  public Integer getAuthCode(){
+  public Integer getAuthCode() {
     return 100000 + secureRandom.nextInt(900000);
+  }
+
+  public Integer getSecureRandomNumberLessThen(int max) {
+    return secureRandom.nextInt(max);
   }
 }

@@ -7,6 +7,6 @@ import softeer.team_pineapple_be.domain.member.domain.Member;
 /**
  * 멤버 리포지토리
  */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, String> {
   public Member findByPhoneNumber(String phoneNumber);
 }
