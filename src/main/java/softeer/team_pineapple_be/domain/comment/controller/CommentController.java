@@ -46,12 +46,12 @@ public class CommentController {
   @Operation(summary = "page, 정렬순서, 날짜에 따라 기대평 가져오기")
   @GetMapping
   public ResponseEntity<CommentPageResponse> getComments(
-      @RequestParam(required = false, defaultValue = "0") Integer page,
-      @RequestParam(required = false, defaultValue = "") String sort, @RequestParam(required = true) LocalDate date) {
+      @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+      @RequestParam(name = "sort", required = false, defaultValue = "") String sort,
+      @RequestParam(name = "date") LocalDate date) {
     if (sort.equals("like")) {
       return ResponseEntity.ok(commentService.getCommentsSortedByLikes(page, date));
-    } else {
-      return ResponseEntity.ok(commentService.getCommentsSortedByRecent(page, date));
     }
+    return ResponseEntity.ok(commentService.getCommentsSortedByRecent(page, date));
   }
 }
