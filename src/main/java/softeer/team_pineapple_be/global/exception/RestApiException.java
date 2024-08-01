@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 예외 클래
+ * 예외 클래스
  */
 @RequiredArgsConstructor
 @Getter
