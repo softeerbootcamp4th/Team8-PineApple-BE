@@ -16,6 +16,7 @@ springdoc:
   paths-to-match:
     - /**
 
+
 server:
   servlet:
     session:
