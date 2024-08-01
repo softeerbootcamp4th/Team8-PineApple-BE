@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 import softeer.team_pineapple_be.domain.member.domain.MemberAuthorization;
+import softeer.team_pineapple_be.domain.member.exception.MemberAuthorizationErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberAuthorizationRepository;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.global.auth.service.PhoneAuthorizationService;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 
 /**
  * 멤버 로그인 인증번호 서비스
@@ -34,21 +36,16 @@ public class MemberAuthorizationService {
   public MemberInfoResponse loginWithAuthCode(String phoneNumber, Integer authCode) {
     MemberAuthorization memberAuthorization = memberAuthorizationRepository.findByPhoneNumber(phoneNumber);
     if (memberAuthorization == null) {
-      //TODO: 인증번호 보낸 적 없음 예외처리
-      throw new RuntimeException();
+      throw new RestApiException(MemberAuthorizationErrorCode.CODE_NOT_SENT);
     }
     if (memberAuthorization.getCodeExpireTime().isBefore(LocalDateTime.now())) {
-      //TODO: 인증 시간 지남 예외처리
-      throw new RuntimeException("");
+      throw new RestApiException(MemberAuthorizationErrorCode.CODE_EXPIRED);
     }
     if (!memberAuthorization.getAuthorizationCode().equals(authCode)) {
-      //TODO: 인증번호 틀림 예외처리
-      throw new RuntimeException();
+      throw new RestApiException(MemberAuthorizationErrorCode.CODE_INCORRECT);
     }
-    Member member = memberRepository.findByPhoneNumber(phoneNumber);
-    if (member == null) {
-      member = memberRepository.save(new Member(phoneNumber));
-    }
+    Member member = memberRepository.findByPhoneNumber(phoneNumber)
+            .orElseGet(() -> memberRepository.save(new Member(phoneNumber)));
     return MemberInfoResponse.of(member);
   }
 
