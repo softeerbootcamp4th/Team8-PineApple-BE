@@ -14,10 +14,10 @@ public class QuizContentResponse {
 
     private Integer id;
     private String quizDescription;
-    private String quizQuesion1;
-    private String quizQuesion2;
-    private String quizQuesion3;
-    private String quizQuesion4;
+    private String quizQuestion1;
+    private String quizQuestion2;
+    private String quizQuestion3;
+    private String quizQuestion4;
 
     /**
      * QuizContent의 엔티티를 응답 형식으로 변환하는 메서드
