@@ -1,5 +1,7 @@
 package softeer.team_pineapple_be.domain.quiz.request;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +15,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuizInfoRequest {
 
-    @NotNull(message = "퀴즈 아이디는 필수입니다.")
+    @NotNull(message = "{quiz.id_required}")
     private Integer quizId;
 
-    @NotNull(message = "퀴즈 정답은 필수입니다.")
+    @NotNull(message = "{quiz.answer_required}")
+    @Min(value = 1, message = "{quiz.answer_num_range_message}")
+    @Max(value = 4, message = "{quiz.answer_num_range_message}")
     private Byte answerNum;
 }
