@@ -10,6 +10,7 @@ import softeer.team_pineapple_be.domain.draw.domain.DrawDailyMessageInfo;
 import softeer.team_pineapple_be.domain.draw.domain.DrawHistory;
 import softeer.team_pineapple_be.domain.draw.domain.DrawPrize;
 import softeer.team_pineapple_be.domain.draw.domain.DrawRewardInfo;
+import softeer.team_pineapple_be.domain.draw.exception.DrawErrorCode;
 import softeer.team_pineapple_be.domain.draw.repository.DrawDailyMessageInfoRepository;
 import softeer.team_pineapple_be.domain.draw.repository.DrawHistoryRepository;
 import softeer.team_pineapple_be.domain.draw.repository.DrawPrizeRepository;
@@ -18,8 +19,10 @@ import softeer.team_pineapple_be.domain.draw.response.DrawLoseResponse;
 import softeer.team_pineapple_be.domain.draw.response.DrawResponse;
 import softeer.team_pineapple_be.domain.draw.response.DrawWinningResponse;
 import softeer.team_pineapple_be.domain.member.domain.Member;
+import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 
 /**
  * 경품 추첨 서비스
@@ -44,12 +47,12 @@ public class DrawService {
   public DrawResponse enterDraw() {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
     Member member =
-        memberRepository.findById(memberPhoneNumber).orElseThrow(() -> new RuntimeException("member not found"));
+        memberRepository.findById(memberPhoneNumber).orElseThrow(() -> new RestApiException(MemberErrorCode.NO_MEMBER));
     canEnterDraw(member);
     member.decrementToolBoxCnt();
     Byte prizeRank = randomDrawPrizeService.drawPrize();
     DrawRewardInfo rewardInfo =
-        drawRewardInfoRepository.findById(prizeRank).orElseThrow(() -> new RuntimeException("prize not found"));
+        drawRewardInfoRepository.findById(prizeRank).orElseThrow(() -> new RestApiException(DrawErrorCode.NO_PRIZE));
     DrawDailyMessageInfo dailyMessageInfo = drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now());
     if (rewardInfo.getStock() == 0 || rewardInfo.getRanking() == 0) {
       drawHistoryRepository.save(new DrawHistory((byte) 0, memberPhoneNumber));
@@ -70,7 +73,7 @@ public class DrawService {
    */
   private void canEnterDraw(Member member) {
     if ((!member.isCar()) || (member.getToolBoxCnt() == 0)) {
-      throw new RuntimeException("can't enter draw");
+      throw new RestApiException(DrawErrorCode.CANNOT_ENTER_DRAW);
     }
   }
 
@@ -83,7 +86,7 @@ public class DrawService {
    */
   private Long setPrizeOwner(DrawRewardInfo rewardInfo, String memberPhoneNumber) {
     DrawPrize prize = drawPrizeRepository.findFirstByDrawRewardInfoAndValid(rewardInfo, true)
-                                         .orElseThrow(() -> new RuntimeException("재고에는 있다고 뜨는데 해당하는 경품이 없음"));
+                                         .orElseThrow(() -> new RestApiException(DrawErrorCode.NO_VALID_PRIZE));
     prize.isNowOwnedBy(memberPhoneNumber);
     prize.invalidate();
     return prize.getId();
