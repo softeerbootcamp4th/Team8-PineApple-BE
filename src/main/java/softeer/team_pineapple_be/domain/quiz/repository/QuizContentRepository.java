@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 //TODO: QueryDSL로 리팩토링
 
@@ -19,5 +20,5 @@ public interface QuizContentRepository extends JpaRepository<QuizContent, Intege
      * @param quizDate 조회하고자 하는 날짜
      * @return 조회된 QuizContent
      */
-    QuizContent findByQuizDate(LocalDate quizDate);
+    Optional<QuizContent> findByQuizDate(LocalDate quizDate);
 }
