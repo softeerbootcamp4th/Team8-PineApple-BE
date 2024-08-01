@@ -6,6 +6,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import softeer.team_pineapple_be.global.auth.exception.AuthErrorCode;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 
 /**
  * 인증된 사용자 정보 가져오기
@@ -20,7 +22,9 @@ public class AuthMemberService {
    */
   public String getMemberPhoneNumber() {
     Object phoneNumber = getCurrentRequest().getSession().getAttribute("phoneNumber");
-    //TODO : 세션정보 존재하지 않으면 예외처리
+    if (phoneNumber == null) {
+      throw new RestApiException(AuthErrorCode.NO_USER_INFO);
+    }
     return (String) phoneNumber;
   }
 
