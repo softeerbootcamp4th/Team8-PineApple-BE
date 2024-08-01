@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.member.request.LoginAuthCodeRequest;
 import softeer.team_pineapple_be.domain.member.request.LoginPhoneNumberRequest;
@@ -28,15 +29,16 @@ public class LoginController {
 
   @Operation(summary = "핸드폰 번호 입력해서 인증번호 받기")
   @PostMapping("/login/phone")
-  public ResponseEntity<SuccessResponse> loginPhone(@RequestBody LoginPhoneNumberRequest loginPhoneNumberRequest) {
+  public ResponseEntity<SuccessResponse> loginPhone(
+      @Valid @RequestBody LoginPhoneNumberRequest loginPhoneNumberRequest) {
     memberAuthorizationService.loginWithPhoneNumber(loginPhoneNumberRequest.getPhoneNumber());
     return ResponseEntity.ok(new SuccessResponse());
   }
 
   @Operation(summary = "인증번호 입력해서 인증")
   @PostMapping("/login/code")
-  public ResponseEntity<MemberInfoResponse> loginWithAuthCode(@RequestBody LoginAuthCodeRequest loginAuthCodeRequest,
-      HttpServletRequest request) {
+  public ResponseEntity<MemberInfoResponse> loginWithAuthCode(
+      @Valid @RequestBody LoginAuthCodeRequest loginAuthCodeRequest, HttpServletRequest request) {
     MemberInfoResponse memberInfoResponse =
         memberAuthorizationService.loginWithAuthCode(loginAuthCodeRequest.getPhoneNumber(),
             loginAuthCodeRequest.getCode());
