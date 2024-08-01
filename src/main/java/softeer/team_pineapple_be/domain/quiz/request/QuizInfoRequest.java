@@ -18,6 +18,6 @@ public class QuizInfoRequest {
     private Integer quizId;
 
     @NotNull(message = "{quiz.answer_required}")
-    @Range(min = 1, max = 4, message = "{quiz.answer_num_range=}")
+    @Range(min = 1, max = 4, message = "{quiz.answer_num_range}")
     private Byte answerNum;
 }
