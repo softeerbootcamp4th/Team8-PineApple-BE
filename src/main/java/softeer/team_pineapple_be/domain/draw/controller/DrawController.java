@@ -1,5 +1,6 @@
 package softeer.team_pineapple_be.domain.draw.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class DrawController {
   }
 
   @PostMapping("/rewards/send-prize")
-  public ResponseEntity<SuccessResponse> sendPrize(@RequestBody SendPrizeRequest request) {
+  public ResponseEntity<SuccessResponse> sendPrize(@Valid @RequestBody SendPrizeRequest request) {
     drawPrizeService.sendPrizeMessage(request.getPrizeId());
     return ResponseEntity.ok(new SuccessResponse());
   }
