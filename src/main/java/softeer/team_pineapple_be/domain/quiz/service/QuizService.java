@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import softeer.team_pineapple_be.domain.member.domain.Member;
+import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
@@ -21,9 +22,6 @@ import softeer.team_pineapple_be.global.exception.RestApiException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.NoSuchElementException;
-
-//TODO: 예외처리(구조 맞추기 위해 남겨둠)
 
 /**
  * QuizContent의 요청에 대한 처리를 담당하는 클래스
@@ -73,13 +71,15 @@ public class QuizService {
     @Transactional
     public MemberInfoResponse quizHistory() {
         String phoneNumber = authMemberService.getMemberPhoneNumber(); // 세션 없을 시 여기서 검증됨
+        Member member = memberRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(()-> new RestApiException(MemberErrorCode.NO_MEMBER));
         QuizContent quizContent = quizContentRepository.findByQuizDate(determineQuizDate())
                 .orElseThrow(() -> new RestApiException(QuizErrorCode.NO_QUIZ_CONTENT));
         quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())
                 .ifPresent(quizHistory -> {
                     throw new RestApiException(QuizErrorCode.PARTICIPATION_EXISTS);
                 });
-        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+
         member.incrementToolBoxCnt();
         memberRepository.save(member);
         QuizHistory quizHistory = new QuizHistory(member, quizContent);
