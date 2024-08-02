@@ -74,11 +74,6 @@ public class CommentService {
   @Transactional
   public void saveComment(CommentRequest commentRequest) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
-    // 멤버 조회 로직이 다른 곳에 다 있어서 넣어뒀습니다.
-    // 코드 보시고 불필요하다 생각 드시면 삭제하셔도 됩니다.
-    // 아마 형님 로직은 phoneNumber 자체를 키로 둬서 안 쓰는 것 같은데 제꺼는 엔티티를 가져와야 해서 일단 넣어두겠습니다.
-    memberRepository.findByPhoneNumber(memberPhoneNumber)
-            .orElseThrow(()-> new RestApiException(MemberErrorCode.NO_MEMBER));
     if (wasMemberCommentedToday(memberPhoneNumber)) {
       throw new RestApiException(CommentErrorCode.ALREADY_REVIEWED);
     }
@@ -88,11 +83,6 @@ public class CommentService {
   @Transactional
   public void saveCommentLike(CommentLikeRequest commentLikeRequest) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
-    // 멤버 조회 로직이 다른 곳에 다 있어서 넣어뒀습니다.
-    // 코드 보시고 불필요하다 생각 드시면 삭제하셔도 됩니다.
-    // 아마 형님 로직은 phoneNumber 자체를 키로 둬서 안 쓰는 것 같은데 제꺼는 엔티티를 가져와야 해서 일단 넣어두겠습니다.
-    memberRepository.findByPhoneNumber(memberPhoneNumber)
-            .orElseThrow(()-> new RestApiException(MemberErrorCode.NO_MEMBER));
     LikeId likeId = new LikeId(commentLikeRequest.getCommentId(), memberPhoneNumber);
     Optional<CommentLike> byId = commentLikeRepository.findById(likeId);
     if (byId.isPresent()) {
