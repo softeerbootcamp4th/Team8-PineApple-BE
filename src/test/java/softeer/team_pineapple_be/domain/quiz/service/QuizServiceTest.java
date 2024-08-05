@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import softeer.team_pineapple_be.domain.member.domain.Member;
+import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.domain.QuizContent;
@@ -48,6 +49,7 @@ public class QuizServiceTest {
     private AuthMemberService authMemberService;
 
     private QuizContent quizContent;
+    private Member member;
     private Integer quizId;
     private Byte correctAnswerNum;
     private Byte incorrectAnswerNum;
@@ -71,7 +73,7 @@ public class QuizServiceTest {
                 "네 번째 질문",       // quizQuestion4
                 LocalDate.now()      // quizDate
         );
-
+        member = new Member(phoneNumber);
     }
 
     @Test
@@ -163,8 +165,6 @@ public class QuizServiceTest {
     @DisplayName("퀴즈 참여기록을 성공적으로 저장했을 때 결과 테스트- SuccessCase")
     void quizHistory_QuizContentExists_And_NoParticipation_ReturnsMemberInfoResponse() {
         // Given
-        Member member = new Member(phoneNumber);
-
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
         when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())).thenReturn(Optional.empty());
@@ -181,10 +181,9 @@ public class QuizServiceTest {
     }
 
     @Test
-    @DisplayName("퀴즈 참여기록을 성공적으로 저장하지 못했을 때 결과 테스트- FailureCase")
+    @DisplayName("퀴즈 참여기록을 조회하려고 했으나 퀴즈 컨텐츠가 존재하지 않는 경우- FailureCase")
     void quizHistory_QuizContentDoesNotExist_ThrowsRestApiException() {
         // Given
-        Member member = new Member(phoneNumber);
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
@@ -199,10 +198,25 @@ public class QuizServiceTest {
     }
 
     @Test
+    @DisplayName("퀴즈 참여기록을 조회하려고 했으나 유저가 존재하지 않는 경우- FailureCase")
+    void quizHistory_MemberDoesNotExist_ThrowsRestApiException() {
+        // Given
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> quizService.quizHistory())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.NO_MEMBER);
+                });
+    }
+
+    @Test
     @DisplayName("퀴즈 참여기록이 이미 존재할 때 결과 테스트- FailureCase")
     void quizHistory_ParticipationExists_ThrowsRestApiException() {
         // Given
-        Member member = new Member(phoneNumber);
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
