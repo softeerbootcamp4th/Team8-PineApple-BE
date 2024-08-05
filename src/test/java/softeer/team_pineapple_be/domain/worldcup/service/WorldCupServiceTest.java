@@ -1,6 +1,7 @@
 package softeer.team_pineapple_be.domain.worldcup.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -38,6 +39,7 @@ public class WorldCupServiceTest {
     }
 
     @Test
+    @DisplayName("멤버가 월드컵에 참여한 기록이 있는지 테스트 - SuccessCase")
     void isMemberParticipated_MemberExists_ReturnsWorldCupParticipateResponse() {
         // given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
@@ -53,6 +55,7 @@ public class WorldCupServiceTest {
     }
 
     @Test
+    @DisplayName("멤버가 월드컵에 참여한 기록이 있는지 확인할 때 멤버가 없는 경우 테스트 - FailureCase")
     void isMemberParticipated_MemberDoesNotExist_ThrowsException() {
         // given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
@@ -69,6 +72,7 @@ public class WorldCupServiceTest {
     }
 
     @Test
+    @DisplayName("멤버가 월드컵 참여하는 경우 테스트 - SuccessCase")
     void participateWorldCup_MemberExists_ReturnsOk() {
         // given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
@@ -84,6 +88,7 @@ public class WorldCupServiceTest {
     }
 
     @Test
+    @DisplayName("멤버가 월드컵 참여할 떄 멤버가 없는 경우 테스트 - FailureCase")
     void participateWorldCup_MemberDoesNotExist_ThrowsRestApiException() {
         // given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
