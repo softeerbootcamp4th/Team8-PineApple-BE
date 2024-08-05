@@ -168,7 +168,7 @@ public class QuizServiceTest {
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
         when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())).thenReturn(Optional.empty());
-        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(member);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
 
         // When
         MemberInfoResponse response = quizService.quizHistory();
@@ -184,7 +184,9 @@ public class QuizServiceTest {
     @DisplayName("퀴즈 참여기록을 성공적으로 저장하지 못했을 때 결과 테스트- FailureCase")
     void quizHistory_QuizContentDoesNotExist_ThrowsRestApiException() {
         // Given
+        Member member = new Member(phoneNumber);
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
 
         // When & Then
@@ -200,7 +202,9 @@ public class QuizServiceTest {
     @DisplayName("퀴즈 참여기록이 이미 존재할 때 결과 테스트- FailureCase")
     void quizHistory_ParticipationExists_ThrowsRestApiException() {
         // Given
+        Member member = new Member(phoneNumber);
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
         when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId()))
                 .thenReturn(Optional.of(new QuizHistory())); // 참여 이력 존재
