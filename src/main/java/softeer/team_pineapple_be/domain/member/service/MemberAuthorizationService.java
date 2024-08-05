@@ -11,8 +11,9 @@ import softeer.team_pineapple_be.domain.member.domain.MemberAuthorization;
 import softeer.team_pineapple_be.domain.member.exception.MemberAuthorizationErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberAuthorizationRepository;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
-import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
+import softeer.team_pineapple_be.domain.member.response.MemberLoginInfoResponse;
 import softeer.team_pineapple_be.global.auth.service.PhoneAuthorizationService;
+import softeer.team_pineapple_be.global.auth.utils.JwtUtils;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
 /**
@@ -24,6 +25,7 @@ public class MemberAuthorizationService {
   private final MemberRepository memberRepository;
   private final PhoneAuthorizationService phoneAuthorizationService;
   private final MemberAuthorizationRepository memberAuthorizationRepository;
+  private final JwtUtils jwtUtils;
 
   /**
    * 인증코드와 전화번호를 받아서 올바른 인증코드를 입력했는지 확인하고 멤버정보 보냄.
@@ -33,7 +35,7 @@ public class MemberAuthorizationService {
    * @return MemberInfoResponse
    */
   @Transactional
-  public MemberInfoResponse loginWithAuthCode(String phoneNumber, Integer authCode) {
+  public MemberLoginInfoResponse loginWithAuthCode(String phoneNumber, Integer authCode) {
     MemberAuthorization memberAuthorization = memberAuthorizationRepository.findByPhoneNumber(phoneNumber);
     if (memberAuthorization == null) {
       throw new RestApiException(MemberAuthorizationErrorCode.CODE_NOT_SENT);
@@ -44,9 +46,12 @@ public class MemberAuthorizationService {
     if (!memberAuthorization.getAuthorizationCode().equals(authCode)) {
       throw new RestApiException(MemberAuthorizationErrorCode.CODE_INCORRECT);
     }
-    Member member = memberRepository.findByPhoneNumber(phoneNumber)
-            .orElseGet(() -> memberRepository.save(new Member(phoneNumber)));
-    return MemberInfoResponse.of(member);
+    Member member =
+        memberRepository.findByPhoneNumber(phoneNumber).orElseGet(() -> memberRepository.save(new Member(phoneNumber)));
+    String accessToken =
+        jwtUtils.createJwt("access_token", member.getPhoneNumber(), member.getRole(), 2 * 24 * 60 * 60 * 1000L);
+
+    return MemberLoginInfoResponse.of(member, accessToken);
   }
 
   /**
