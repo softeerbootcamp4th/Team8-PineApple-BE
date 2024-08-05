@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'softeer'
@@ -11,6 +12,29 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test // test 작업 후 jacocoTestReport 실행
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.required.set(true)
+    }
+    classDirectories.setFrom(files(sourceSets.main.output.classesDirs.asFileTree.matching {
+        exclude '**/config/**'
+        exclude '**/response/**'
+        exclude '**/request/**'
+        exclude '**/domain/**/domain/**'
+        exclude '**/softeer/team_pineapple_be/*.class'
+        exclude '**/enum/**'
+        exclude '**/global/**/domain/**'
+        exclude '**/softeer/team_pineapple_be/global/**/exception'
+    }))
 }
 
 configurations {
@@ -40,4 +64,5 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }

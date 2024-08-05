@@ -2,7 +2,9 @@ package softeer.team_pineapple_be.domain.quiz.domain;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 //TODO: quizDescription 넣어야 될지 얘기해보기
 /**
@@ -11,6 +13,8 @@ import lombok.Getter;
  */
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuizInfo {
 
     @Id
