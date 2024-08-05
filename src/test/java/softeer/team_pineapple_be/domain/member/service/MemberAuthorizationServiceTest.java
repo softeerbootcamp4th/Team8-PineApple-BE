@@ -72,5 +72,18 @@ public class MemberAuthorizationServiceTest {
         verify(jwtUtils).createJwt("access_token", phoneNumber, member.getRole(), 2 * 24 * 60 * 60 * 1000L);
     }
 
+    @Test
+    void loginWithAuthCode_CodeNotSent_ThrowsException() {
+        // given
+        when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode))
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberAuthorizationErrorCode.CODE_NOT_SENT);
+                });
+    }
 
 }
