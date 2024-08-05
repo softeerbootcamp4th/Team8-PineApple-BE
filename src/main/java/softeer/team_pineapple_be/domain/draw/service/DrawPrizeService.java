@@ -5,8 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.draw.domain.DrawPrize;
+import softeer.team_pineapple_be.domain.draw.exception.DrawErrorCode;
 import softeer.team_pineapple_be.domain.draw.repository.DrawPrizeRepository;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 import softeer.team_pineapple_be.global.message.MessageService;
 
 /**
@@ -22,9 +24,9 @@ public class DrawPrizeService {
   @Transactional
   public void sendPrizeMessage(Long prizeId) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
-    DrawPrize prize = drawPrizeRepository.findById(prizeId).orElseThrow(() -> new RuntimeException("상품 없음"));
+    DrawPrize prize = drawPrizeRepository.findById(prizeId).orElseThrow(() -> new RestApiException(DrawErrorCode.NO_PRIZE));
     if (!memberPhoneNumber.equals(prize.getOwner())) {
-      throw new RuntimeException("상품 소유자 아님");
+      throw new RestApiException(DrawErrorCode.NOT_PRIZE_OWNER);
     }
     messageService.sendPrizeImage(prize.getImage());
   }

@@ -16,13 +16,17 @@ import lombok.extern.slf4j.Slf4j;
 import softeer.team_pineapple_be.domain.comment.domain.Comment;
 import softeer.team_pineapple_be.domain.comment.domain.CommentLike;
 import softeer.team_pineapple_be.domain.comment.domain.id.LikeId;
+import softeer.team_pineapple_be.domain.comment.exception.CommentErrorCode;
 import softeer.team_pineapple_be.domain.comment.repository.CommentLikeRepository;
 import softeer.team_pineapple_be.domain.comment.repository.CommentRepository;
 import softeer.team_pineapple_be.domain.comment.request.CommentLikeRequest;
 import softeer.team_pineapple_be.domain.comment.request.CommentRequest;
 import softeer.team_pineapple_be.domain.comment.response.CommentPageResponse;
+import softeer.team_pineapple_be.domain.member.domain.Member;
+import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 
 /**
  * 기대평 서비스
@@ -71,8 +75,7 @@ public class CommentService {
   public void saveComment(CommentRequest commentRequest) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
     if (wasMemberCommentedToday(memberPhoneNumber)) {
-      log.info("이미 기대평 작성");
-      return;
+      throw new RestApiException(CommentErrorCode.ALREADY_REVIEWED);
     }
     commentRepository.save(new Comment(commentRequest.getContent(), memberPhoneNumber));
   }
@@ -83,11 +86,12 @@ public class CommentService {
     LikeId likeId = new LikeId(commentLikeRequest.getCommentId(), memberPhoneNumber);
     Optional<CommentLike> byId = commentLikeRepository.findById(likeId);
     if (byId.isPresent()) {
-      //TODO: 이미 좋아요 누름 예외처리
+      // 예외처리 로직이 아닌 취소 처리가 되어야 할 것 같아 남겨두었습니다.
+      //TODO: 이미 좋아요 누름 취소처리
       return;
     }
     Comment comment = commentRepository.findById(commentLikeRequest.getCommentId())
-                                       .orElseThrow(() -> new RuntimeException("이후 처리합시다"));
+                                       .orElseThrow(() -> new RestApiException(CommentErrorCode.NO_COMMENT));
     comment.increaseLikeCount();
     commentLikeRepository.save(new CommentLike(likeId));
   }

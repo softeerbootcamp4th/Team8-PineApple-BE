@@ -1,5 +1,6 @@
 package softeer.team_pineapple_be.domain.comment.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,14 +32,14 @@ public class CommentController {
 
   @Operation(summary = "기대평 남기기")
   @PostMapping
-  public ResponseEntity<SuccessResponse> addComment(@RequestBody CommentRequest commentRequest) {
+  public ResponseEntity<SuccessResponse> addComment(@Valid @RequestBody CommentRequest commentRequest) {
     commentService.saveComment(commentRequest);
     return ResponseEntity.ok(new SuccessResponse());
   }
 
   @Operation(summary = "좋아요 누르기")
   @PostMapping("/likes")
-  public ResponseEntity<SuccessResponse> addLikes(@RequestBody CommentLikeRequest commentLikeRequest) {
+  public ResponseEntity<SuccessResponse> addLikes(@Valid @RequestBody CommentLikeRequest commentLikeRequest) {
     commentService.saveCommentLike(commentLikeRequest);
     return ResponseEntity.ok(new SuccessResponse());
   }

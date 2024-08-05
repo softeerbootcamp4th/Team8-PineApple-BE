@@ -36,3 +36,4 @@ public class AuthMemberService {
     return (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
   }
 }
+
