@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,6 +42,7 @@ public class WorldCupControllerTest {
     }
 
     @Test
+    @DisplayName("/worldcup/participate의 get 요청 api 요청에 대한 응답 테스트 - SuccessCase")
     void getParticipate_ReturnsOk_WhenMemberParticipated() throws Exception {
         // given
         WorldCupParticipateResponse response = new WorldCupParticipateResponse(true);
@@ -54,6 +56,7 @@ public class WorldCupControllerTest {
     }
 
     @Test
+    @DisplayName("/worldcup/participate의 post 요청 api 요청에 대한 응답 테스트 - SuccessCase")
     void participate_ReturnsOk_WhenParticipationIsSuccessful() throws Exception {
         // given
         doNothing().when(worldCupService).participateWorldCup();
