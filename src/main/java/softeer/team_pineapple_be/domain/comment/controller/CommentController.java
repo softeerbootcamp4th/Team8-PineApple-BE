@@ -1,6 +1,5 @@
 package softeer.team_pineapple_be.domain.comment.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,11 +12,13 @@ import java.time.LocalDate;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.comment.request.CommentLikeRequest;
 import softeer.team_pineapple_be.domain.comment.request.CommentRequest;
 import softeer.team_pineapple_be.domain.comment.response.CommentPageResponse;
 import softeer.team_pineapple_be.domain.comment.service.CommentService;
+import softeer.team_pineapple_be.global.auth.annotation.Auth;
 import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 
 /**
@@ -30,6 +31,7 @@ import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 public class CommentController {
   private final CommentService commentService;
 
+  @Auth
   @Operation(summary = "기대평 남기기")
   @PostMapping
   public ResponseEntity<SuccessResponse> addComment(@Valid @RequestBody CommentRequest commentRequest) {
@@ -37,6 +39,7 @@ public class CommentController {
     return ResponseEntity.ok(new SuccessResponse());
   }
 
+  @Auth
   @Operation(summary = "좋아요 누르기")
   @PostMapping("/likes")
   public ResponseEntity<SuccessResponse> addLikes(@Valid @RequestBody CommentLikeRequest commentLikeRequest) {
