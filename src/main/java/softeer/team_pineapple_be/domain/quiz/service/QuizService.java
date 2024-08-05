@@ -18,10 +18,8 @@ import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
 import softeer.team_pineapple_be.global.exception.RestApiException;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.NoSuchElementException;
 
 //TODO: 예외처리(구조 맞추기 위해 남겨둠)
 
@@ -88,12 +86,17 @@ public class QuizService {
     }
 
     private LocalDate determineQuizDate() {
-        LocalTime twoPm = LocalTime.of(14, 0);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
         // 현재 시간이 2시 이전인지 확인
-        if (LocalTime.now().isBefore(twoPm)) {
+        if (LocalTime.now().isBefore(atNoon)) {
             return LocalDate.now().minusDays(1);
-        } else {
-            return LocalDate.now();
         }
+
+        if(LocalTime.now().isBefore(onePm) && LocalTime.now().isAfter(atNoon)) {
+            throw new RestApiException(QuizErrorCode.NO_QUIZ_CONTENT);
+        }
+
+        return LocalDate.now();
     }
 }
