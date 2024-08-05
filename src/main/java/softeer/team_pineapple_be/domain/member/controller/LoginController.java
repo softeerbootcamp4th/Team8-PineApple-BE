@@ -13,8 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.member.request.LoginAuthCodeRequest;
 import softeer.team_pineapple_be.domain.member.request.LoginPhoneNumberRequest;
-import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
+import softeer.team_pineapple_be.domain.member.response.MemberLoginInfoResponse;
 import softeer.team_pineapple_be.domain.member.service.MemberAuthorizationService;
+import softeer.team_pineapple_be.global.auth.annotation.Auth;
 import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 
 /**
@@ -37,16 +38,15 @@ public class LoginController {
 
   @Operation(summary = "인증번호 입력해서 인증")
   @PostMapping("/login/code")
-  public ResponseEntity<MemberInfoResponse> loginWithAuthCode(
+  public ResponseEntity<MemberLoginInfoResponse> loginWithAuthCode(
       @Valid @RequestBody LoginAuthCodeRequest loginAuthCodeRequest, HttpServletRequest request) {
-    MemberInfoResponse memberInfoResponse =
+    MemberLoginInfoResponse memberLoginInfoResponse =
         memberAuthorizationService.loginWithAuthCode(loginAuthCodeRequest.getPhoneNumber(),
             loginAuthCodeRequest.getCode());
-    HttpSession session = request.getSession();
-    session.setAttribute("phoneNumber", memberInfoResponse.getPhoneNumber());
-    return ResponseEntity.ok(memberInfoResponse);
+    return ResponseEntity.ok(memberLoginInfoResponse);
   }
 
+  @Auth
   @Operation(summary = "로그아웃")
   @PostMapping("/logout")
   public ResponseEntity<SuccessResponse> logout(HttpServletRequest request) {

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.worldcup.response.WorldCupParticipateResponse;
 import softeer.team_pineapple_be.domain.worldcup.service.WorldCupService;
+import softeer.team_pineapple_be.global.auth.annotation.Auth;
 import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 
 /**
@@ -23,6 +24,7 @@ import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 public class WorldCupController {
   private final WorldCupService worldCupService;
 
+  @Auth
   @Operation(summary = "월드컵 참여했는지 확인")
   @GetMapping("/participate")
   public ResponseEntity<WorldCupParticipateResponse> getParticipate() {
@@ -30,6 +32,7 @@ public class WorldCupController {
     return ResponseEntity.ok(worldCupParticipateResponse);
   }
 
+  @Auth
   @Operation(summary = "월드컵 참여 여부 등록")
   @PostMapping("/participate")
   public ResponseEntity<SuccessResponse> participate() {

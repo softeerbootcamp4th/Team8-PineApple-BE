@@ -1,17 +1,18 @@
 package softeer.team_pineapple_be.domain.draw.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.draw.request.SendPrizeRequest;
 import softeer.team_pineapple_be.domain.draw.response.DrawResponse;
 import softeer.team_pineapple_be.domain.draw.service.DrawPrizeService;
 import softeer.team_pineapple_be.domain.draw.service.DrawService;
+import softeer.team_pineapple_be.global.auth.annotation.Auth;
 import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 
 /**
@@ -24,11 +25,13 @@ public class DrawController {
   private final DrawService drawService;
   private final DrawPrizeService drawPrizeService;
 
+  @Auth
   @PostMapping
   public ResponseEntity<DrawResponse> enterDraw() {
     return ResponseEntity.ok(drawService.enterDraw());
   }
 
+  @Auth
   @PostMapping("/rewards/send-prize")
   public ResponseEntity<SuccessResponse> sendPrize(@Valid @RequestBody SendPrizeRequest request) {
     drawPrizeService.sendPrizeMessage(request.getPrizeId());

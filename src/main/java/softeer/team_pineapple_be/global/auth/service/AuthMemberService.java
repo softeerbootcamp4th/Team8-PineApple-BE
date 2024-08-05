@@ -6,6 +6,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import softeer.team_pineapple_be.global.auth.context.AuthContextHolder;
 import softeer.team_pineapple_be.global.auth.exception.AuthErrorCode;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
@@ -21,11 +22,11 @@ public class AuthMemberService {
    * @return 핸드폰 번호 String
    */
   public String getMemberPhoneNumber() {
-    Object phoneNumber = getCurrentRequest().getSession().getAttribute("phoneNumber");
+    String phoneNumber = AuthContextHolder.getAuthContext().getPhoneNumber();
     if (phoneNumber == null) {
       throw new RestApiException(AuthErrorCode.NO_USER_INFO);
     }
-    return (String) phoneNumber;
+    return phoneNumber;
   }
 
   private HttpServletRequest getCurrentRequest() {
