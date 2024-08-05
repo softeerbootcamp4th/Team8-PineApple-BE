@@ -1,6 +1,7 @@
 package softeer.team_pineapple_be.domain.member.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,6 +17,7 @@ import softeer.team_pineapple_be.global.auth.utils.JwtUtils;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -52,6 +54,7 @@ public class MemberAuthorizationServiceTest {
     }
 
     @Test
+    @DisplayName("토큰을 이용한 로그인 요청이 성공한 경우 - SuccessCase")
     void loginWithAuthCode_Success_ReturnsMemberLoginInfoResponse() {
         // given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
@@ -73,6 +76,7 @@ public class MemberAuthorizationServiceTest {
     }
 
     @Test
+    @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 전송되지 않은 경우 - FailureCase")
     void loginWithAuthCode_CodeNotSent_ThrowsException() {
         // given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(null);
@@ -83,6 +87,35 @@ public class MemberAuthorizationServiceTest {
                 .satisfies(exception -> {
                     RestApiException restApiException = (RestApiException) exception; // 캐스팅
                     assertThat(restApiException.getErrorCode()).isEqualTo(MemberAuthorizationErrorCode.CODE_NOT_SENT);
+                });
+    }
+
+//    @Test
+//    void loginWithAuthCode_CodeExpired_ThrowsException() {
+//        // given
+//        when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
+//        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+//
+//        // when & then
+//        assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode))
+//                .isInstanceOf(RestApiException.class)
+//                .satisfies(exception -> {
+//                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+//                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberAuthorizationErrorCode.CODE_EXPIRED);
+//                });
+//    }
+
+    @Test
+    void loginWithAuthCode_CodeIncorrect_ThrowsException() {
+        // given
+        when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
+
+        // when & then
+        assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, 654321))
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberAuthorizationErrorCode.CODE_INCORRECT);
                 });
     }
 
