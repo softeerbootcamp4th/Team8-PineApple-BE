@@ -2,6 +2,7 @@ package softeer.team_pineapple_be.domain.quiz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,20 +13,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
+import softeer.team_pineapple_be.domain.quiz.exception.QuizErrorCode;
 import softeer.team_pineapple_be.domain.quiz.request.QuizInfoRequest;
 import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.service.QuizService;
+import softeer.team_pineapple_be.global.exception.RestApiException;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class QuizControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
     @Mock
@@ -44,6 +49,7 @@ class QuizControllerTest {
     }
 
     @Test
+    @DisplayName("/quiz의 api 요청에 대한 응답 테스트 - SuccessCase")
     void getQuizContent_ReturnsQuizContentResponse() throws Exception {
         // Given
         QuizContentResponse response = new QuizContentResponse(
@@ -68,9 +74,10 @@ class QuizControllerTest {
     }
 
     @Test
+    @DisplayName("/quiz/answer의 api 요청에 대한 응답 테스트 - SuccessCase")
     void isCorrect_ReturnsQuizInfoResponse() throws Exception {
         // Given
-        QuizInfoRequest request = new QuizInfoRequest(1, (byte)1); // 필요한 필드 초기화
+        QuizInfoRequest request = new QuizInfoRequest(1, (byte) 1); // 필요한 필드 초기화
         QuizInfoResponse response = new QuizInfoResponse(true, "quizImage.png");
         doReturn(response).when(quizService).quizIsCorrect(any(QuizInfoRequest.class));
 
@@ -84,6 +91,7 @@ class QuizControllerTest {
     }
 
     @Test
+    @DisplayName("/quiz/participants의 api 요청에 대한 응답 테스트 - SuccessCase")
     void setQuizHistory_ReturnsMemberInfoResponse() throws Exception {
         // Given
         Member member = new Member("010-1234-5678");
@@ -95,5 +103,6 @@ class QuizControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.phoneNumber").exists());
     }
+
 }
 
