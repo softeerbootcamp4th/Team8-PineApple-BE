@@ -23,10 +23,14 @@ public class Member {
   @Column(nullable = false)
   private boolean car;
 
+  @Column(nullable = false)
+  private String role;
+
   public Member(String phoneNumber) {
     this.phoneNumber = phoneNumber;
     toolBoxCnt = 0;
     car = false;
+    role = "USER";
   }
 
   public void decrementToolBoxCnt() {
