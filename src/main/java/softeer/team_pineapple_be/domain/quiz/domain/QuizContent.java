@@ -1,7 +1,9 @@
 package softeer.team_pineapple_be.domain.quiz.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -10,6 +12,8 @@ import java.time.LocalDate;
  */
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuizContent {
 
     @Id
