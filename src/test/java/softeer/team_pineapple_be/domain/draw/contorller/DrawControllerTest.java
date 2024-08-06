@@ -4,7 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,6 +35,8 @@ public class DrawControllerTest {
     @InjectMocks
     private DrawController drawController;
 
+    private ObjectMapper objectMapper;
+
     private DrawWinningResponse winningResponse;
     private DrawLoseResponse loseResponse;
 
@@ -42,10 +46,12 @@ public class DrawControllerTest {
         mockMvc = standaloneSetup(drawController).build();
         winningResponse = new DrawWinningResponse("당첨 메시지", "경품 이름", "image_url", 1L, true, 3);
         loseResponse = new DrawLoseResponse("꽝 메시지", "꽝 시나리오", "image_url", false, 0);
+        objectMapper = new ObjectMapper();
     }
 
     @Test
-    public void enterDraw_ShouldReturnWinningResponse_WhenDrawIsWin() throws Exception {
+    @DisplayName("응모가 성공적으로 참여하여 당첨된 경우 - SuccessCase")
+    public void enterDraw_DrawIsWin_ReturnWinningResponse() throws Exception {
         // Given
         when(drawService.enterDraw()).thenReturn(winningResponse);
 
@@ -59,7 +65,8 @@ public class DrawControllerTest {
     }
 
     @Test
-    public void enterDraw_ShouldReturnLoseResponse_WhenDrawIsLose() throws Exception {
+    @DisplayName("응모가 성공적으로 참여하여 낙첨된 경우 - SuccessCase")
+    public void enterDraw_DrawIsLose_ReturnLoseResponse() throws Exception {
         // Given
         when(drawService.enterDraw()).thenReturn(loseResponse);
 
@@ -73,7 +80,8 @@ public class DrawControllerTest {
     }
 
     @Test
-    public void sendPrize_ShouldReturnSuccessResponse() throws Exception {
+    @DisplayName("상품 전송을 하는 경우 - SuccessCase")
+    public void sendPrize_ReturnSuccessResponse() throws Exception {
         // Given
         Long prizeId = 1L; // 예시
         SendPrizeRequest request = new SendPrizeRequest(prizeId);
@@ -82,7 +90,7 @@ public class DrawControllerTest {
         // When & Then
         mockMvc.perform(post("/draw/rewards/send-prize")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"prizeId\": " + prizeId + "}"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(successResponse.getStatus()))
                 .andExpect(jsonPath("$.message").value(successResponse.getMessage()));
