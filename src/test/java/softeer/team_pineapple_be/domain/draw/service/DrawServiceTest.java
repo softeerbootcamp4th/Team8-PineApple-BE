@@ -101,5 +101,26 @@ class DrawServiceTest {
         assert response instanceof DrawWinningResponse;
     }
 
+    @Test
+    @DisplayName("사용자가 응모에 성공적으로 참여했으나 경품 재고가 없어 당첨에 실패한 케이스 - SuccessCase")
+    void enterDraw_PrizeIsNotAvailable_ReturnLoseResponse() {
+        // Given
+        Member member = new Member(phoneNumber);
+        member.incrementToolBoxCnt(); // 툴박스 개수 증가
+        member.generateCar(); // 차량 보유 설정
+
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+        when(randomDrawPrizeService.drawPrize()).thenReturn(prizeRank);
+        when(drawRewardInfoRepository.findById(prizeRank)).thenReturn(Optional.of(new DrawRewardInfo(prizeRank, "Prize", 0, null))); // 재고 없음
+        when(drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now())).thenReturn(Optional.of(drawDailyMessageInfo));
+
+        // When
+        DrawResponse response = drawService.enterDraw();
+
+        // Then
+        verify(drawHistoryRepository).save(any(DrawHistory.class));
+        assert response instanceof DrawLoseResponse;
+    }
 
 }
