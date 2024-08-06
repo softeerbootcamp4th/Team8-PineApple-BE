@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import softeer.team_pineapple_be.domain.comment.domain.Comment;
+import softeer.team_pineapple_be.domain.comment.utils.PhoneNumberMasker;
 
 /**
  * 기대평 응답
@@ -21,7 +22,7 @@ public class CommentResponse {
   private LocalDateTime postTime;
 
   public static CommentResponse fromComment(Comment comment) {
-    return new CommentResponse(comment.getId(), comment.getPhoneNumber(), comment.getContent(), comment.getLikeCount(),
-        comment.getPostTime());
+    return new CommentResponse(comment.getId(), PhoneNumberMasker.maskPhoneNumber(comment.getPhoneNumber()),
+        comment.getContent(), comment.getLikeCount(), comment.getPostTime());
   }
 }
