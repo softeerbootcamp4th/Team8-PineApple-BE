@@ -39,7 +39,7 @@ public class LoginController {
   @Operation(summary = "인증번호 입력해서 인증")
   @PostMapping("/login/code")
   public ResponseEntity<MemberLoginInfoResponse> loginWithAuthCode(
-      @Valid @RequestBody LoginAuthCodeRequest loginAuthCodeRequest, HttpServletRequest request) {
+      @Valid @RequestBody LoginAuthCodeRequest loginAuthCodeRequest) {
     MemberLoginInfoResponse memberLoginInfoResponse =
         memberAuthorizationService.loginWithAuthCode(loginAuthCodeRequest.getPhoneNumber(),
             loginAuthCodeRequest.getCode());
@@ -49,11 +49,7 @@ public class LoginController {
   @Auth
   @Operation(summary = "로그아웃")
   @PostMapping("/logout")
-  public ResponseEntity<SuccessResponse> logout(HttpServletRequest request) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
+  public ResponseEntity<SuccessResponse> logout() {
     return ResponseEntity.ok(new SuccessResponse());
   }
 }

@@ -150,10 +150,10 @@ public class QuizServiceTest {
             // Then
             assertThat(response).isNotNull();
             assertThat(response.getQuizDescription()).isEqualTo(quizContent.getQuizDescription());
-            assertThat(response.getQuizQuestion1()).isEqualTo(quizContent.getQuizQuestion1());
-            assertThat(response.getQuizQuestion2()).isEqualTo(quizContent.getQuizQuestion2());
-            assertThat(response.getQuizQuestion3()).isEqualTo(quizContent.getQuizQuestion3());
-            assertThat(response.getQuizQuestion4()).isEqualTo(quizContent.getQuizQuestion4());
+            assertThat(response.getQuizQuestions().get(1)).isEqualTo(quizContent.getQuizQuestion1());
+            assertThat(response.getQuizQuestions().get(2)).isEqualTo(quizContent.getQuizQuestion2());
+            assertThat(response.getQuizQuestions().get(3)).isEqualTo(quizContent.getQuizQuestion3());
+            assertThat(response.getQuizQuestions().get(4)).isEqualTo(quizContent.getQuizQuestion4());
 
         }
     }
@@ -177,10 +177,10 @@ public class QuizServiceTest {
             // Then
             assertThat(response).isNotNull();
             assertThat(response.getQuizDescription()).isEqualTo(quizContent.getQuizDescription());
-            assertThat(response.getQuizQuestion1()).isEqualTo(quizContent.getQuizQuestion1());
-            assertThat(response.getQuizQuestion2()).isEqualTo(quizContent.getQuizQuestion2());
-            assertThat(response.getQuizQuestion3()).isEqualTo(quizContent.getQuizQuestion3());
-            assertThat(response.getQuizQuestion4()).isEqualTo(quizContent.getQuizQuestion4());
+            assertThat(response.getQuizQuestions().get(1)).isEqualTo(quizContent.getQuizQuestion1());
+            assertThat(response.getQuizQuestions().get(2)).isEqualTo(quizContent.getQuizQuestion2());
+            assertThat(response.getQuizQuestions().get(3)).isEqualTo(quizContent.getQuizQuestion3());
+            assertThat(response.getQuizQuestions().get(4)).isEqualTo(quizContent.getQuizQuestion4());
 
         }
     }
