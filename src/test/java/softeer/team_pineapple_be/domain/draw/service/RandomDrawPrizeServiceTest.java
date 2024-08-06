@@ -39,25 +39,25 @@ class RandomDrawPrizeServiceTest {
     @Test
     @DisplayName("경품 추첨시 등록된 순위에 대한 정보가 나오는지 테스트 - SuccessCase")
     void drawPrize_ReturnValidRanking() {
-        // given
+        // Given
         when(drawProbabilityRepository.findAll()).thenReturn(probabilityList);
         randomDrawPrizeService.init();
 
-        // when
+        // When
         Byte result = randomDrawPrizeService.drawPrize();
 
-        // then
+        // Then
         assertThat(result).isIn((byte) 1, (byte) 2, (byte) 3);
     }
 
     @Test
     @DisplayName("경품 추첨시 확률 정보가 신뢰할 수 있는지 테스트 - SuccessCase")
     void drawPrize_RespectProbabilities() {
-        // given
+        // Given
         when(drawProbabilityRepository.findAll()).thenReturn(probabilityList);
         randomDrawPrizeService.init();
 
-        // when
+        // When
         int[] count = new int[4];
         int iterations = 10000;
 
@@ -66,7 +66,7 @@ class RandomDrawPrizeServiceTest {
             count[result]++;
         }
 
-        // then
+        // Then
         assertThat(count[1]).isGreaterThan(count[2]);
         assertThat(count[2]).isGreaterThan(count[3]);
     }
