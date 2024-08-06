@@ -77,6 +77,9 @@ public class CommentService {
     if (wasMemberCommentedToday(memberPhoneNumber)) {
       throw new RestApiException(CommentErrorCode.ALREADY_REVIEWED);
     }
+    Member member =
+        memberRepository.findById(memberPhoneNumber).orElseThrow(() -> new RestApiException(MemberErrorCode.NO_MEMBER));
+    member.incrementToolBoxCnt();
     commentRepository.save(new Comment(commentRequest.getContent(), memberPhoneNumber));
   }
 
