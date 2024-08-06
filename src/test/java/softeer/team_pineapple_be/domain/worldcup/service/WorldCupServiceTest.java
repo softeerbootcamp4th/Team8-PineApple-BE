@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import softeer.team_pineapple_be.domain.draw.domain.DrawHistory;
+import softeer.team_pineapple_be.domain.draw.domain.DrawRewardInfo;
+import softeer.team_pineapple_be.domain.draw.exception.DrawErrorCode;
+import softeer.team_pineapple_be.domain.draw.response.DrawLoseResponse;
+import softeer.team_pineapple_be.domain.draw.response.DrawResponse;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
@@ -13,7 +18,12 @@ import softeer.team_pineapple_be.domain.worldcup.response.WorldCupParticipateRes
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +66,7 @@ public class WorldCupServiceTest {
 
     @Test
     @DisplayName("멤버가 월드컵에 참여한 기록이 있는지 확인할 때 멤버가 없는 경우 테스트 - FailureCase")
-    void isMemberParticipated_MemberDoesNotExist_ThrowsException() {
+    void isMemberParticipated_MemberDoesNotExist_ThrowsRestApiException() {
         // given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(java.util.Optional.empty());
@@ -95,11 +105,12 @@ public class WorldCupServiceTest {
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(java.util.Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> worldCupService.isMemberParticipated()) // AssertJ 사용
+        assertThatThrownBy(() -> worldCupService.participateWorldCup()) // AssertJ 사용
                 .isInstanceOf(RestApiException.class)
                 .satisfies(exception -> {
                     RestApiException restApiException = (RestApiException) exception; // 캐스팅
                     assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.NO_MEMBER);
                 });
     }
+
 }

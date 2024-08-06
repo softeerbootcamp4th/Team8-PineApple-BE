@@ -60,7 +60,7 @@ class DrawPrizeServiceTest {
 
     @Test
     @DisplayName("해당하는 상품이 존재하지 않는 경우 테스트 - FailureCase")
-    void sendPrizeMessage_PrizeNotFound_ThrowException() {
+    void sendPrizeMessage_PrizeNotFound_ThrowRestApiException() {
         // Given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(OWNER_PHONE_NUMBER);
         when(drawPrizeRepository.findById(PRIZE_ID)).thenReturn(Optional.empty());
@@ -76,7 +76,7 @@ class DrawPrizeServiceTest {
 
     @Test
     @DisplayName("본인이 아닌 다른 경품에 대한 문자 전송을 요청하는 경우 테스트 - FailureCase")
-    void sendPrizeMessage_NotPrizeOwner_ThrowException() {
+    void sendPrizeMessage_NotPrizeOwner_ThrowRestApiException() {
         // Given
         String differentOwnerPhoneNumber = "987-654-3210";
         when(authMemberService.getMemberPhoneNumber()).thenReturn(differentOwnerPhoneNumber);

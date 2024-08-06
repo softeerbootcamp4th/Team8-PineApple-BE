@@ -125,7 +125,7 @@ class DrawServiceTest {
 
     @Test
     @DisplayName("사용자가 참여하려고 했으나 존재하지 않는 멤버인 케이스 - FailureCase")
-    void enterDraw_MemberNotFound_ThrowException() {
+    void enterDraw_MemberNotFound_ThrowRestApiException() {
         // Given
         when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.empty());
@@ -141,7 +141,7 @@ class DrawServiceTest {
 
     @Test
     @DisplayName("사용자가 참여 자격이 없는 케이스 - FailureCase")
-    void enterDraw_CannotEnterDraw_ThrowException() {
+    void enterDraw_CannotEnterDraw_ThrowRestApiException() {
         // Given
         Member member = new Member(phoneNumber);
         member.decrementToolBoxCnt(); // 툴박스 개수 감소
@@ -160,7 +160,7 @@ class DrawServiceTest {
 
     @Test
     @DisplayName("사용자가 응모에 참여하려고 했으나 응모 참여 가능한 날짜가 아닌 케이스 - FailureCase")
-    void enterDraw_DailyMessageNotExists_ThrowException() {
+    void enterDraw_DailyMessageNotExists_ThrowRestApiException() {
         // Given
         Member member = new Member(phoneNumber);
         member.incrementToolBoxCnt(); // 툴박스 개수 증가
@@ -199,6 +199,30 @@ class DrawServiceTest {
                 .satisfies(exception -> {
                     RestApiException restApiException = (RestApiException) exception; // 캐스팅
                     assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.NO_PRIZE);
+                });
+    }
+
+    @Test
+    @DisplayName("상품이 유효하지 않은 케이스 - FailureCase")
+    void enterDraw_NoValidPrizeFound_ThrowRestApiException() {
+        // Given
+        Member member = new Member(phoneNumber);
+        member.incrementToolBoxCnt(); // 툴박스 개수 증가
+        member.generateCar();
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member)); // Member 객체 추가
+        when(randomDrawPrizeService.drawPrize()).thenReturn(prizeRank);
+        when(drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now())).thenReturn(Optional.of(drawDailyMessageInfo));
+        DrawRewardInfo rewardInfo = new DrawRewardInfo(prizeRank, "Prize", 1, new ArrayList<>());
+        when(drawRewardInfoRepository.findById(prizeRank)).thenReturn(Optional.of(rewardInfo));
+        when(drawPrizeRepository.findFirstByDrawRewardInfoAndValid(rewardInfo, true)).thenReturn(Optional.empty()); // 빈 Optional 반환
+
+        // When & Then
+        assertThatThrownBy(() -> drawService.enterDraw())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.NO_VALID_PRIZE);
                 });
     }
 }
