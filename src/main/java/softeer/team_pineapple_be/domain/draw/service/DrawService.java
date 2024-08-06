@@ -47,14 +47,15 @@ public class DrawService {
   public DrawResponse enterDraw() {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
     Member member =
-        memberRepository.findById(memberPhoneNumber).orElseThrow(() -> new RestApiException(MemberErrorCode.NO_MEMBER));
+        memberRepository.findByPhoneNumber(memberPhoneNumber).orElseThrow(() -> new RestApiException(MemberErrorCode.NO_MEMBER));
     canEnterDraw(member);
     member.decrementToolBoxCnt();
     Byte prizeRank = randomDrawPrizeService.drawPrize();
-    DrawRewardInfo rewardInfo =
-        drawRewardInfoRepository.findById(prizeRank).orElseThrow(() -> new RestApiException(DrawErrorCode.NO_PRIZE));
-    DrawDailyMessageInfo dailyMessageInfo = drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now());
-    if (rewardInfo.getStock() == 0 || rewardInfo.getRanking() == 0) {
+    DrawRewardInfo rewardInfo = drawRewardInfoRepository.findById(prizeRank)
+                .orElseThrow(() -> new RestApiException(DrawErrorCode.NO_PRIZE));
+    DrawDailyMessageInfo dailyMessageInfo = drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now())
+            .orElseThrow(() -> new RestApiException(DrawErrorCode.NOT_VALID_DATE)); // 예외처리
+    if (rewardInfo.getRanking() == 0 || rewardInfo.getStock() == 0) {
       drawHistoryRepository.save(new DrawHistory((byte) 0, memberPhoneNumber));
       return new DrawLoseResponse(dailyMessageInfo.getLoseMessage(), dailyMessageInfo.getLoseScenario(),
           dailyMessageInfo.getLoseImage(), member.isCar(), member.getToolBoxCnt());
