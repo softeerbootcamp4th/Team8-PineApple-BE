@@ -115,6 +115,7 @@ public class MemberAuthorizationServiceTest {
     }
 
     @Test
+    @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 만료된 경우 - FailureCase")
     void loginWithAuthCode_CodeExpired_ThrowsException() {
         // given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
@@ -134,10 +135,11 @@ public class MemberAuthorizationServiceTest {
                         RestApiException restApiException = (RestApiException) exception; // 캐스팅
                         assertThat(restApiException.getErrorCode()).isEqualTo(MemberAuthorizationErrorCode.CODE_EXPIRED);
                     });
-        } // MockedStatic이 종료되면 원래의 LocalDateTime.now() 메소드가 복원됩니다.
+        }
     }
 
     @Test
+    @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 부정확한 경우 - FailureCase")
     void loginWithAuthCode_CodeIncorrect_ThrowsException() {
         // given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
@@ -152,6 +154,7 @@ public class MemberAuthorizationServiceTest {
     }
 
     @Test
+    @DisplayName("핸드폰 번호를 이용한 인증 요청 시 인증번호가 제대로 전송된 경우 - SuccessCase")
     void loginWithPhoneNumber_Success_SavesAuthorizationCode() {
         // given
         when(phoneAuthorizationService.sendAuthMessage(phoneNumber)).thenReturn(authCode);
@@ -166,11 +169,9 @@ public class MemberAuthorizationServiceTest {
     }
 
     @Test
+    @DisplayName("핸드폰 번호를 이용한 인증 요청 시 인증이 제대로 되었으며 이미 존재하는 멤버가 있는 경우 - SuccessCase")
     void loginWithPhoneNumber_UpdatesAuthorizationCode_WhenExists() {
         // given
-//        Integer newAuthorizationCode = 654321; // 새로운 인증 코드
-//        when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
-//        memberAuthorizationService.loginWithPhoneNumber(phoneNumber);
         Integer newAuthCode = 654321; // 새로운 인증 코드
         MemberAuthorization existingAuthorization = new MemberAuthorization(phoneNumber, 123456); // 기존 인증 정보 객체 생성
 
