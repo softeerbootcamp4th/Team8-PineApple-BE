@@ -57,15 +57,15 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("토큰을 이용한 로그인 요청이 성공한 경우 - SuccessCase")
     void loginWithAuthCode_Success_ReturnsMemberLoginInfoResponse() {
-        // given
+        // Given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
         when(jwtUtils.createJwt(anyString(), anyString(), anyString(), anyLong())).thenReturn("mockedToken");
 
-        // when
+        // When
         MemberLoginInfoResponse response = memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode);
 
-        // then
+        // Then
         assertThat(response).isNotNull();
         assertThat(response.getPhoneNumber()).isEqualTo(phoneNumber);
         assertThat(response.getToolBoxCnt()).isEqualTo(0);
@@ -79,16 +79,16 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("토큰을 이용한 로그인 요청이 성공한 경우 - SuccessCase")
     void loginWithAuthCode_MemberNotExists_Success_ReturnsMemberLoginInfoResponse() {
-        // given
+        // Given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.empty());
         when(memberRepository.save(any(Member.class))).thenReturn(new Member(phoneNumber));
         when(jwtUtils.createJwt(anyString(), anyString(), anyString(), anyLong())).thenReturn("mockedToken");
 
-        // when
+        // When
         MemberLoginInfoResponse response = memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode);
 
-        // then
+        // Then
         assertThat(response).isNotNull();
         assertThat(response.getPhoneNumber()).isEqualTo(phoneNumber);
         assertThat(response.getToolBoxCnt()).isEqualTo(0);
@@ -102,10 +102,10 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 전송되지 않은 경우 - FailureCase")
     void loginWithAuthCode_CodeNotSent_ThrowsException() {
-        // given
+        // Given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(null);
 
-        // when & then
+        // When & Then
         assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode))
                 .isInstanceOf(RestApiException.class)
                 .satisfies(exception -> {
@@ -117,7 +117,7 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 만료된 경우 - FailureCase")
     void loginWithAuthCode_CodeExpired_ThrowsException() {
-        // given
+        // Given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
         when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
 
@@ -128,7 +128,7 @@ public class MemberAuthorizationServiceTest {
         try (MockedStatic<LocalDateTime> mockedStatic = mockStatic(LocalDateTime.class)) {
             mockedStatic.when(LocalDateTime::now).thenReturn(expiredTime);
 
-            // when & then
+            // When & Then
             assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, authCode))
                     .isInstanceOf(RestApiException.class)
                     .satisfies(exception -> {
@@ -141,10 +141,10 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("토큰을 이용한 로그인 요청시도했으나 코드가 부정확한 경우 - FailureCase")
     void loginWithAuthCode_CodeIncorrect_ThrowsException() {
-        // given
+        // Given
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(memberAuthorization);
 
-        // when & then
+        // When & Then
         assertThatThrownBy(() -> memberAuthorizationService.loginWithAuthCode(phoneNumber, 654321))
                 .isInstanceOf(RestApiException.class)
                 .satisfies(exception -> {
@@ -156,14 +156,14 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("핸드폰 번호를 이용한 인증 요청 시 인증번호가 제대로 전송된 경우 - SuccessCase")
     void loginWithPhoneNumber_Success_SavesAuthorizationCode() {
-        // given
+        // Given
         when(phoneAuthorizationService.sendAuthMessage(phoneNumber)).thenReturn(authCode);
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(null);
 
-        // when
+        // When
         memberAuthorizationService.loginWithPhoneNumber(phoneNumber);
 
-        // then
+        // Then
         verify(phoneAuthorizationService).sendAuthMessage(phoneNumber);
         verify(memberAuthorizationRepository).save(any(MemberAuthorization.class));
     }
@@ -171,15 +171,13 @@ public class MemberAuthorizationServiceTest {
     @Test
     @DisplayName("핸드폰 번호를 이용한 인증 요청 시 인증이 제대로 되었으며 이미 존재하는 멤버가 있는 경우 - SuccessCase")
     void loginWithPhoneNumber_UpdatesAuthorizationCode_WhenExists() {
-        // given
+        // Given
         Integer newAuthCode = 654321; // 새로운 인증 코드
         MemberAuthorization existingAuthorization = new MemberAuthorization(phoneNumber, 123456); // 기존 인증 정보 객체 생성
-
-        // Mock 설정
         when(phoneAuthorizationService.sendAuthMessage(phoneNumber)).thenReturn(newAuthCode);
         when(memberAuthorizationRepository.findByPhoneNumber(phoneNumber)).thenReturn(existingAuthorization); // 기존 인증 정보 반환
 
-        // when
+        // When
         memberAuthorizationService.loginWithPhoneNumber(phoneNumber);
 
         // then
@@ -187,8 +185,6 @@ public class MemberAuthorizationServiceTest {
         assertThat(existingAuthorization.getAuthorizationCode()).isEqualTo(newAuthCode);
         // 코드 만료 시간도 업데이트되었는지 확인
         assertThat(existingAuthorization.getCodeExpireTime()).isAfter(LocalDateTime.now());
-
-        // save가 호출되지 않았는지 확인
         verify(memberAuthorizationRepository, never()).save(any());
 
     }

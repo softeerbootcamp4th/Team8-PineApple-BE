@@ -29,7 +29,6 @@ public class WorldCupControllerTest {
     @Mock
     private WorldCupService worldCupService;
 
-    @Autowired
     private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;

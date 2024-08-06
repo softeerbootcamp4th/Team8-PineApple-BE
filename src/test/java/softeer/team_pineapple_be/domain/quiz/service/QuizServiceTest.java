@@ -212,7 +212,7 @@ public class QuizServiceTest {
 
     @Test
     @DisplayName("퀴즈 컨텐츠가 성공적으로 반한되지 못한 결과 테스트 - FailureCase")
-    void getQuizContent_QuizContentNotFound_ThrowsException() {
+    void getQuizContent_QuizContentNotFound_ThrowsRestApiException() {
         // Given
         when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
 
