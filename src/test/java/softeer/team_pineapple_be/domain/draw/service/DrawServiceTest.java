@@ -158,4 +158,26 @@ class DrawServiceTest {
                 });
     }
 
+    @Test
+    @DisplayName("사용자가 응모에 참여하려고 했으나 응모 참여 가능한 날짜가 아닌 케이스 - FailureCase")
+    void enterDraw_DailyMessageNotExists_ThrowException() {
+        // Given
+        Member member = new Member(phoneNumber);
+        member.incrementToolBoxCnt(); // 툴박스 개수 증가
+        member.generateCar(); // 차량 보유 설정
+
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+        when(randomDrawPrizeService.drawPrize()).thenReturn(prizeRank);
+        when(drawRewardInfoRepository.findById(prizeRank)).thenReturn(Optional.of(rewardInfo));
+        when(drawDailyMessageInfoRepository.findByDrawDate(LocalDate.now())).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> drawService.enterDraw())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.NOT_VALID_DATE);
+                });
+    }
 }
