@@ -180,4 +180,25 @@ class DrawServiceTest {
                     assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.NOT_VALID_DATE);
                 });
     }
+
+    @Test
+    @DisplayName("순위에 존재하지 않는 상품이 뽑힌 케이스 - FailureCase")
+    void enterDraw_NoPrizeFound_ThrowRestApiException() {
+        // Given
+
+        Member member = new Member(phoneNumber);
+        member.incrementToolBoxCnt(); // 툴박스 개수 증가
+        member.generateCar();
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member)); // Member 객체 추가
+        when(drawRewardInfoRepository.findById(prizeRank)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> drawService.enterDraw())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.NO_PRIZE);
+                });
+    }
 }
