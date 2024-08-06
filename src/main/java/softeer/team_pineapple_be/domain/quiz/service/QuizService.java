@@ -91,12 +91,13 @@ public class QuizService {
     private LocalDate determineQuizDate() {
         LocalTime onePm = LocalTime.of(13, 0);
         LocalTime atNoon = LocalTime.of(12, 0);
-        // 현재 시간이 2시 이전인지 확인
-        if (LocalTime.now().isBefore(atNoon)) {
+        LocalTime now = LocalTime.now();
+        // 현재 시간이 12시 이전인지 확인
+        if (now.isBefore(atNoon)) {
             return LocalDate.now().minusDays(1);
         }
 
-        if(LocalTime.now().isBefore(onePm) && LocalTime.now().isAfter(atNoon)) {
+        if(now.isBefore(onePm) && now.isAfter(atNoon)) {
             throw new RestApiException(QuizErrorCode.NO_QUIZ_CONTENT);
         }
 
