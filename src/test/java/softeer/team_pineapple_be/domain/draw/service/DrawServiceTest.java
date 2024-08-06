@@ -139,4 +139,23 @@ class DrawServiceTest {
                 });
     }
 
+    @Test
+    @DisplayName("사용자가 참여 자격이 없는 케이스 - FailureCase")
+    void enterDraw_CannotEnterDraw_ThrowException() {
+        // Given
+        Member member = new Member(phoneNumber);
+        member.decrementToolBoxCnt(); // 툴박스 개수 감소
+        // 차량 보유 설정 없음
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+
+        // When & Then
+        assertThatThrownBy(() -> drawService.enterDraw())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(DrawErrorCode.CANNOT_ENTER_DRAW);
+                });
+    }
+
 }
