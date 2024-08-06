@@ -25,6 +25,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+      return true;
+    }
     if (!checkAnnotation(handler, Auth.class)) {
       return true;
     }
