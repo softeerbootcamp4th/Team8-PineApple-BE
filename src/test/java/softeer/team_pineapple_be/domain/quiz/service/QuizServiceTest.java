@@ -8,8 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import softeer.team_pineapple_be.domain.member.domain.Member;
+import softeer.team_pineapple_be.domain.member.exception.MemberAuthorizationErrorCode;
 import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
@@ -26,6 +28,8 @@ import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 public class QuizServiceTest {
@@ -128,21 +132,82 @@ public class QuizServiceTest {
     }
 
     @Test
-    @DisplayName("퀴즈 컨텐츠가 성공적으로 반한된 결과 테스트 - SuccessCase")
-    void getQuizContent_QuizContentExists_ReturnsContent() {
+    @DisplayName("13시 이후 퀴즈 컨텐츠가 성공적으로 반한된 결과 테스트 - SuccessCase")
+    void getQuizContent_TodayQuizContentExists_ReturnsContent() {
         // Given
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+        LocalTime yesterDayQuizTime = LocalTime.of(15, 0, 0, 0);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
 
-        // When
-        QuizContentResponse response = quizService.getQuizContent();
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(yesterDayQuizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+            // When
+            QuizContentResponse response = quizService.getQuizContent();
 
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getQuizDescription()).isEqualTo(quizContent.getQuizDescription());
-        assertThat(response.getQuizQuestion1()).isEqualTo(quizContent.getQuizQuestion1());
-        assertThat(response.getQuizQuestion2()).isEqualTo(quizContent.getQuizQuestion2());
-        assertThat(response.getQuizQuestion3()).isEqualTo(quizContent.getQuizQuestion3());
-        assertThat(response.getQuizQuestion4()).isEqualTo(quizContent.getQuizQuestion4());
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getQuizDescription()).isEqualTo(quizContent.getQuizDescription());
+            assertThat(response.getQuizQuestion1()).isEqualTo(quizContent.getQuizQuestion1());
+            assertThat(response.getQuizQuestion2()).isEqualTo(quizContent.getQuizQuestion2());
+            assertThat(response.getQuizQuestion3()).isEqualTo(quizContent.getQuizQuestion3());
+            assertThat(response.getQuizQuestion4()).isEqualTo(quizContent.getQuizQuestion4());
+
+        }
+    }
+
+    @Test
+    @DisplayName("12시 이전 퀴즈 컨텐츠가 성공적으로 반한된 결과 테스트 - SuccessCase")
+    void getQuizContent_YesterdayQuizContentExists_ReturnsContent() {
+        // Given
+        LocalTime yesterdayQuizTime = LocalTime.of(8, 0, 0, 0);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(yesterdayQuizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+            // When
+            QuizContentResponse response = quizService.getQuizContent();
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getQuizDescription()).isEqualTo(quizContent.getQuizDescription());
+            assertThat(response.getQuizQuestion1()).isEqualTo(quizContent.getQuizQuestion1());
+            assertThat(response.getQuizQuestion2()).isEqualTo(quizContent.getQuizQuestion2());
+            assertThat(response.getQuizQuestion3()).isEqualTo(quizContent.getQuizQuestion3());
+            assertThat(response.getQuizQuestion4()).isEqualTo(quizContent.getQuizQuestion4());
+
+        }
+    }
+
+    @Test
+    @DisplayName("12~13시 사이의 퀴즈 참여 시간이 아니어서 에러가 발생되는 결과 테스트 - FailureCase")
+    void getQuizContent_NotQuizTime_ReturnsContent() {
+        // Given
+        LocalTime yesterDayQuizTime = LocalTime.of(12, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(yesterDayQuizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+            // When
+            assertThatThrownBy(() -> {
+                quizService.getQuizContent();
+            }).isInstanceOf(RestApiException.class)
+                    .satisfies(exception -> {
+                        RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                        assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.NO_QUIZ_CONTENT);
+                    });
+
+        }
     }
 
     @Test
