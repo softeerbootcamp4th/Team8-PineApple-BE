@@ -123,4 +123,20 @@ class DrawServiceTest {
         assert response instanceof DrawLoseResponse;
     }
 
+    @Test
+    @DisplayName("사용자가 참여하려고 했으나 존재하지 않는 멤버인 케이스 - FailureCase")
+    void enterDraw_MemberNotFound_ThrowException() {
+        // Given
+        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> drawService.enterDraw())
+                .isInstanceOf(RestApiException.class)
+                .satisfies(exception -> {
+                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.NO_MEMBER);
+                });
+    }
+
 }
