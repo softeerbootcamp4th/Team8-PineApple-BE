@@ -20,6 +20,9 @@ import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.service.QuizService;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
@@ -30,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class QuizControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
     @Mock
@@ -52,13 +54,16 @@ class QuizControllerTest {
     @DisplayName("/quiz의 api 요청에 대한 응답 테스트 - SuccessCase")
     void getQuizContent_ReturnsQuizContentResponse() throws Exception {
         // Given
+        Map<Integer, String> questions = new HashMap<>();
+        questions.put(1, "질문 1");
+        questions.put(2, "질문 2");
+        questions.put(3, "질문 3");
+        questions.put(4, "질문 4");
+
         QuizContentResponse response = new QuizContentResponse(
                 1,
                 "퀴즈 설명",
-                "질문 1",
-                "질문 2",
-                "질문 3",
-                "질문 4"
+                questions
         );
         doReturn(response).when(quizService).getQuizContent();
 
@@ -67,10 +72,10 @@ class QuizControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.quizDescription").value("퀴즈 설명"))
-                .andExpect(jsonPath("$.quizQuestion1").value("질문 1"))
-                .andExpect(jsonPath("$.quizQuestion2").value("질문 2"))
-                .andExpect(jsonPath("$.quizQuestion3").value("질문 3"))
-                .andExpect(jsonPath("$.quizQuestion4").value("질문 4"));
+                .andExpect(jsonPath("$.quizQuestions['1']").value("질문 1"))
+                .andExpect(jsonPath("$.quizQuestions['2']").value("질문 2"))
+                .andExpect(jsonPath("$.quizQuestions['3']").value("질문 3"))
+                .andExpect(jsonPath("$.quizQuestions['4']").value("질문 4"));
     }
 
     @Test
