@@ -3,6 +3,7 @@ package softeer.team_pineapple_be.global.auth.interceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +40,10 @@ public class JwtInterceptor implements HandlerInterceptor {
   }
 
   private boolean checkAnnotation(Object handler, Class<Auth> authClass) {
+    if (handler instanceof ResourceHttpRequestHandler) {
+      return false;
+    }
+
     HandlerMethod handlerMethod = (HandlerMethod) handler;
     if (null != handlerMethod.getMethodAnnotation(authClass) ||
         null != handlerMethod.getBeanType().getAnnotation(authClass)) {
