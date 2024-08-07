@@ -39,6 +39,7 @@ public class CommentService {
   private final CommentLikeRepository commentLikeRepository;
   private final AuthMemberService authMemberService;
   private final MemberRepository memberRepository;
+  private final LikeRedisService likeRedisService;
 
   /**
    * 기대평을 좋아요 순으로 가져오는 메서드
@@ -50,7 +51,7 @@ public class CommentService {
     PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "likeCount"));
     Page<Comment> commentPage =
         commentRepository.findAllByPostTimeBetween(pageRequest, date.atStartOfDay(), date.atTime(LocalTime.MAX));
-    return CommentPageResponse.fromCommentPage(commentPage);
+    return CommentPageResponse.fromCommentPage(commentPage, likeRedisService);
   }
 
   /**
@@ -63,7 +64,7 @@ public class CommentService {
     PageRequest commentRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postTime"));
     Page<Comment> commentPage =
         commentRepository.findAllByPostTimeBetween(commentRequest, date.atStartOfDay(), date.atTime(LocalTime.MAX));
-    return CommentPageResponse.fromCommentPage(commentPage);
+    return CommentPageResponse.fromCommentPage(commentPage, likeRedisService);
   }
 
   /**
@@ -83,19 +84,27 @@ public class CommentService {
     commentRepository.save(new Comment(commentRequest.getContent(), memberPhoneNumber));
   }
 
+  /**
+   * 좋아요 누름 처리하는 메서드 이미 눌렀으면 좋아요를 줄이고, 안눌렀으면 좋아요 증가시킴
+   * TODO: 동시성 문제가 발생할 수 있으니 처리하자
+   *
+   * @param commentLikeRequest
+   */
   @Transactional
   public void saveCommentLike(CommentLikeRequest commentLikeRequest) {
     String memberPhoneNumber = authMemberService.getMemberPhoneNumber();
     LikeId likeId = new LikeId(commentLikeRequest.getCommentId(), memberPhoneNumber);
     Optional<CommentLike> byId = commentLikeRepository.findById(likeId);
-    if (byId.isPresent()) {
-      // 예외처리 로직이 아닌 취소 처리가 되어야 할 것 같아 남겨두었습니다.
-      //TODO: 이미 좋아요 누름 취소처리
-      return;
-    }
     Comment comment = commentRepository.findById(commentLikeRequest.getCommentId())
                                        .orElseThrow(() -> new RestApiException(CommentErrorCode.NO_COMMENT));
+    if (byId.isPresent()) {
+      likeRedisService.removeLike(comment.getId());
+      comment.decreaseLikeCount();
+      commentLikeRepository.delete(byId.get());
+      return;
+    }
     comment.increaseLikeCount();
+    likeRedisService.addLike(comment.getId());
     commentLikeRepository.save(new CommentLike(likeId));
   }
 
