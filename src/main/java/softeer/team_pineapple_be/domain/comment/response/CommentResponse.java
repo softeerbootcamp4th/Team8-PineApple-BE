@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import softeer.team_pineapple_be.domain.comment.domain.Comment;
+import softeer.team_pineapple_be.domain.comment.service.LikeRedisService;
 import softeer.team_pineapple_be.domain.comment.utils.PhoneNumberMasker;
 
 /**
@@ -20,9 +21,10 @@ public class CommentResponse {
   private String content;
   private Integer likeCount;
   private LocalDateTime postTime;
+  private Boolean isLiked;
 
-  public static CommentResponse fromComment(Comment comment) {
+  public static CommentResponse fromComment(Comment comment, LikeRedisService likeRedisService) {
     return new CommentResponse(comment.getId(), PhoneNumberMasker.maskPhoneNumber(comment.getPhoneNumber()),
-        comment.getContent(), comment.getLikeCount(), comment.getPostTime());
+        comment.getContent(), comment.getLikeCount(), comment.getPostTime(), likeRedisService.isLiked(comment.getId()));
   }
 }
