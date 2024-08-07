@@ -37,6 +37,10 @@ public class Comment {
     postTime = LocalDateTime.now();
   }
 
+  public void decreaseLikeCount() {
+    this.likeCount--;
+  }
+
   public void increaseLikeCount() {
     this.likeCount++;
   }
