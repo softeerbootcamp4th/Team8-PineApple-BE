@@ -39,12 +39,5 @@ public class AuthMemberService {
     return authContext.getPhoneNumber();
   }
 
-  private HttpServletRequest getCurrentRequest() {
-    return getRequestAttributes().getRequest();
-  }
-
-  private ServletRequestAttributes getRequestAttributes() {
-    return (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-  }
 }
 
