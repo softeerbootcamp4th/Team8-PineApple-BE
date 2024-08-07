@@ -116,7 +116,7 @@ public class QuizServiceTest {
 
     @Test
     @DisplayName("퀴즈 정답 제출 시 해당하는 퀴즈가 없을 때 테스트 - FailureCase")
-    void quizIsCorrect_QuizNotFound_ThrowsException() {
+    void quizIsCorrect_QuizNotFound_ThrowsRestApiException() {
         // Given
         QuizInfoRequest request = new QuizInfoRequest(quizId, correctAnswerNum);
         when(quizInfoRepository.findById(quizId)).thenReturn(Optional.empty());
