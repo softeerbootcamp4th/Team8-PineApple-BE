@@ -28,10 +28,24 @@ public class JwtInterceptor implements HandlerInterceptor {
     if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
       return true;
     }
+    String authorization = request.getHeader("Authorization");
     if (!checkAnnotation(handler, Auth.class)) {
+      if (authorization == null) {
+        return true;
+      }
+      authorizeAndSaveContext(authorization);
       return true;
     }
-    String authorization = request.getHeader("Authorization");
+    return authorizeAndSaveContext(authorization);
+  }
+
+  /**
+   * 인증하고 컨텍스트 저장하는 메서드
+   *
+   * @param authorization
+   * @return 인증 성공 여부
+   */
+  private boolean authorizeAndSaveContext(String authorization) {
     String token;
     if (authorization == null || !authorization.startsWith("Bearer ")) {
       throw new RestApiException(AuthErrorCode.JWT_PARSING_ERROR);
@@ -42,6 +56,13 @@ public class JwtInterceptor implements HandlerInterceptor {
     return true;
   }
 
+  /**
+   * Auth 어노테이션 존재하는지 확인하는 메소드
+   *
+   * @param handler
+   * @param authClass
+   * @return
+   */
   private boolean checkAnnotation(Object handler, Class<Auth> authClass) {
     if (handler instanceof ResourceHttpRequestHandler) {
       return false;
@@ -53,5 +74,23 @@ public class JwtInterceptor implements HandlerInterceptor {
       return true;
     }
     return false;
+  }
+
+  /**
+   * 굳이 인증이 필요 없는데 컨텍스트는 저장하는 메소드
+   *
+   * @param authorization
+   */
+  private void saveContext(String authorization) {
+    if (authorization == null || !authorization.startsWith("Bearer ")) {
+      return;
+    }
+    String token = authorization.substring(7);
+    try {
+      jwtUtils.isExpired(token);
+    } catch (Exception e) {
+      return;
+    }
+    AuthContextHolder.setAuthContext(new AuthContext(jwtUtils.getPhoneNumber(token), jwtUtils.getRole(token)));
   }
 }
