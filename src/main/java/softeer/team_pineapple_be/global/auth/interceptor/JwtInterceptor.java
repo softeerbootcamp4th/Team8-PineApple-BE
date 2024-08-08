@@ -33,7 +33,7 @@ public class JwtInterceptor implements HandlerInterceptor {
       if (authorization == null) {
         return true;
       }
-      authorizeAndSaveContext(authorization);
+      saveContext(authorization);
       return true;
     }
     return authorizeAndSaveContext(authorization);
