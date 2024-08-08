@@ -19,4 +19,4 @@ jobs:
           username: ${{ secrets.USER}}
           script: |
             chmod u+x autobuild
-            autobuild
+            ./autobuild
