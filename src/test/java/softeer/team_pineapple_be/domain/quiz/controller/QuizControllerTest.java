@@ -70,7 +70,7 @@ class QuizControllerTest {
         // When & Then
         mockMvc.perform(get("/quiz"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.quizId").value(1))
                 .andExpect(jsonPath("$.quizDescription").value("퀴즈 설명"))
                 .andExpect(jsonPath("$.quizQuestions['1']").value("질문 1"))
                 .andExpect(jsonPath("$.quizQuestions['2']").value("질문 2"))

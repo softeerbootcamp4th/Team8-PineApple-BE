@@ -56,7 +56,7 @@ public class WorldCupController {
 
   @Operation(summary = "월드컵 결과 가져오기")
   @GetMapping("/results")
-  ResponseEntity<List<WorldCupResultResponse>> postResult() {
+  ResponseEntity<List<WorldCupResultResponse>> getResult() {
     return ResponseEntity.ok(worldCupService.getWorldCupResults());
   }
 
