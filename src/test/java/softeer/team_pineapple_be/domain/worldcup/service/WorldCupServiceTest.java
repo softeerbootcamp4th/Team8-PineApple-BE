@@ -14,12 +14,16 @@ import softeer.team_pineapple_be.domain.draw.response.DrawResponse;
 import softeer.team_pineapple_be.domain.member.domain.Member;
 import softeer.team_pineapple_be.domain.member.exception.MemberErrorCode;
 import softeer.team_pineapple_be.domain.member.repository.MemberRepository;
+import softeer.team_pineapple_be.domain.worldcup.request.WorldCupResultRequest;
 import softeer.team_pineapple_be.domain.worldcup.response.WorldCupParticipateResponse;
+import softeer.team_pineapple_be.domain.worldcup.response.WorldCupResultResponse;
 import softeer.team_pineapple_be.global.auth.service.AuthMemberService;
 import softeer.team_pineapple_be.global.exception.RestApiException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -31,6 +35,9 @@ public class WorldCupServiceTest {
 
     @InjectMocks
     private WorldCupService worldCupService;
+
+    @Mock
+    private WorldCupRedisService worldCupRedisService;
 
     @Mock
     private MemberRepository memberRepository;
@@ -47,6 +54,39 @@ public class WorldCupServiceTest {
         phoneNumber = "010-1234-5678";
         member = new Member(phoneNumber);
     }
+
+    @Test
+    public void testAddWorldCupResult() {
+        // Arrange
+        WorldCupResultRequest request = new WorldCupResultRequest(1); // 예시 ID
+
+        // Act
+        worldCupService.addWorldCupResult(request);
+
+        // Assert
+        verify(worldCupRedisService).increaseAnswerIdCount(1);
+    }
+
+    @Test
+    public void testGetWorldCupResults() {
+        // Arrange
+        WorldCupResultResponse response1 = new WorldCupResultResponse(1, 10L, 30L);
+        WorldCupResultResponse response2 = new WorldCupResultResponse(2, 20L, 70L);
+        when(worldCupRedisService.getWorldCupResults()).thenReturn(Arrays.asList(response1, response2));
+
+        // Act
+        List<WorldCupResultResponse> results = worldCupService.getWorldCupResults();
+
+        // Assert
+        assertThat(results).hasSize(2)
+                .extracting(WorldCupResultResponse::getId)
+                .containsExactly(1, 2);
+        assertThat(results).extracting(WorldCupResultResponse::getCount)
+                .containsExactly(10L, 20L);
+        assertThat(results).extracting(WorldCupResultResponse::getPercent)
+                .containsExactly(30L, 70L);
+    }
+
 
     @Test
     @DisplayName("멤버가 월드컵에 참여한 기록이 있는지 테스트 - SuccessCase")

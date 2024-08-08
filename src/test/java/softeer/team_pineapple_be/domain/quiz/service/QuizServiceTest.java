@@ -116,7 +116,7 @@ public class QuizServiceTest {
 
     @Test
     @DisplayName("퀴즈 정답 제출 시 해당하는 퀴즈가 없을 때 테스트 - FailureCase")
-    void quizIsCorrect_QuizNotFound_ThrowsException() {
+    void quizIsCorrect_QuizNotFound_ThrowsRestApiException() {
         // Given
         QuizInfoRequest request = new QuizInfoRequest(quizId, correctAnswerNum);
         when(quizInfoRepository.findById(quizId)).thenReturn(Optional.empty());
@@ -213,88 +213,128 @@ public class QuizServiceTest {
     @Test
     @DisplayName("퀴즈 컨텐츠가 성공적으로 반한되지 못한 결과 테스트 - FailureCase")
     void getQuizContent_QuizContentNotFound_ThrowsRestApiException() {
-        // Given
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
+        LocalTime quizTime = LocalTime.of(15, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(quizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            // Given
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
 
-        // When & Then: 예외가 발생하는지 확인
-        assertThatThrownBy(() -> {
-            quizService.getQuizContent();
-        }).isInstanceOf(RestApiException.class)
-                .satisfies(exception -> {
-                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
-                    assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.NO_QUIZ_CONTENT);
-                });
+            // When & Then: 예외가 발생하는지 확인
+            assertThatThrownBy(() -> {
+                quizService.getQuizContent();
+            }).isInstanceOf(RestApiException.class)
+                    .satisfies(exception -> {
+                        RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                        assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.NO_QUIZ_CONTENT);
+                    });
+        }
     }
 
     @Test
     @DisplayName("퀴즈 참여기록을 성공적으로 저장했을 때 결과 테스트- SuccessCase")
     void quizHistory_QuizContentExists_And_NoParticipation_ReturnsMemberInfoResponse() {
-        // Given
-        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
-        when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())).thenReturn(Optional.empty());
-        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+        LocalTime quizTime = LocalTime.of(15, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(quizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            // Given
+            when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+            when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId())).thenReturn(Optional.empty());
+            when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
 
-        // When
-        MemberInfoResponse response = quizService.quizHistory();
+            // When
+            MemberInfoResponse response = quizService.quizHistory();
 
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getPhoneNumber()).isEqualTo(phoneNumber);
-        assertThat(member.getToolBoxCnt()).isEqualTo(1); // 툴박스 카운트 증가 확인
-        verify(quizHistoryRepository).save(any(QuizHistory.class)); // 퀴즈 이력 저장 확인
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getPhoneNumber()).isEqualTo(phoneNumber);
+            assertThat(member.getToolBoxCnt()).isEqualTo(1); // 툴박스 카운트 증가 확인
+            verify(quizHistoryRepository).save(any(QuizHistory.class)); // 퀴즈 이력 저장 확인
+        }
     }
 
     @Test
     @DisplayName("퀴즈 참여기록을 조회하려고 했으나 퀴즈 컨텐츠가 존재하지 않는 경우- FailureCase")
     void quizHistory_QuizContentDoesNotExist_ThrowsRestApiException() {
-        // Given
-        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
-        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
+        LocalTime quizTime = LocalTime.of(15, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(quizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            // Given
+            when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+            when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
 
-        // When & Then
-        assertThatThrownBy(() -> quizService.quizHistory())
-                .isInstanceOf(RestApiException.class)
-                .satisfies(exception -> {
-                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
-                    assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.NO_QUIZ_CONTENT);
-                });
+            // When & Then
+            assertThatThrownBy(() -> quizService.quizHistory())
+                    .isInstanceOf(RestApiException.class)
+                    .satisfies(exception -> {
+                        RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                        assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.NO_QUIZ_CONTENT);
+                    });
+        }
     }
 
     @Test
     @DisplayName("퀴즈 참여기록을 조회하려고 했으나 유저가 존재하지 않는 경우- FailureCase")
     void quizHistory_MemberDoesNotExist_ThrowsRestApiException() {
-        // Given
-        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
+        LocalTime quizTime = LocalTime.of(15, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(quizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            // Given
+            when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.empty());
 
-        // When & Then
-        assertThatThrownBy(() -> quizService.quizHistory())
-                .isInstanceOf(RestApiException.class)
-                .satisfies(exception -> {
-                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
-                    assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.NO_MEMBER);
-                });
+            // When & Then
+            assertThatThrownBy(() -> quizService.quizHistory())
+                    .isInstanceOf(RestApiException.class)
+                    .satisfies(exception -> {
+                        RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                        assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.NO_MEMBER);
+                    });
+        }
     }
 
     @Test
     @DisplayName("퀴즈 참여기록이 이미 존재할 때 결과 테스트- FailureCase")
     void quizHistory_ParticipationExists_ThrowsRestApiException() {
-        // Given
-        when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
-        when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
-        when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
-        when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId()))
-                .thenReturn(Optional.of(new QuizHistory())); // 참여 이력 존재
+        LocalTime quizTime = LocalTime.of(15, 30);
+        LocalTime onePm = LocalTime.of(13, 0);
+        LocalTime atNoon = LocalTime.of(12, 0);
+        try (MockedStatic<LocalTime> mockedStatic = mockStatic(LocalTime.class)) {
+            mockedStatic.when(LocalTime::now).thenReturn(quizTime);
+            mockedStatic.when(() -> LocalTime.of(12, 0)).thenReturn(atNoon);
+            mockedStatic.when(() -> LocalTime.of(13, 0)).thenReturn(onePm);
+            // Given
+            when(authMemberService.getMemberPhoneNumber()).thenReturn(phoneNumber);
+            when(memberRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(member));
+            when(quizContentRepository.findByQuizDate(any())).thenReturn(Optional.of(quizContent));
+            when(quizHistoryRepository.findByMemberPhoneNumberAndQuizContentId(phoneNumber, quizContent.getId()))
+                    .thenReturn(Optional.of(new QuizHistory())); // 참여 이력 존재
 
-        // When & Then
-        assertThatThrownBy(() -> quizService.quizHistory())
-                .isInstanceOf(RestApiException.class)
-                .satisfies(exception -> {
-                    RestApiException restApiException = (RestApiException) exception; // 캐스팅
-                    assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.PARTICIPATION_EXISTS);
-                });
+            // When & Then
+            assertThatThrownBy(() -> quizService.quizHistory())
+                    .isInstanceOf(RestApiException.class)
+                    .satisfies(exception -> {
+                        RestApiException restApiException = (RestApiException) exception; // 캐스팅
+                        assertThat(restApiException.getErrorCode()).isEqualTo(QuizErrorCode.PARTICIPATION_EXISTS);
+                    });
+        }
     }
 
 }
