@@ -47,4 +47,8 @@ public class Member {
   public void incrementToolBoxCnt() {
     this.toolBoxCnt += 1;
   }
+
+  public void increment10ToolBoxCnt() {
+    this.toolBoxCnt += 10;
+  }
 }
