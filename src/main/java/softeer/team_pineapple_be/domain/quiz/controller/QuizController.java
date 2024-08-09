@@ -13,10 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import softeer.team_pineapple_be.domain.member.response.MemberInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.request.QuizInfoRequest;
+import softeer.team_pineapple_be.domain.quiz.request.QuizRewardRequest;
 import softeer.team_pineapple_be.domain.quiz.response.QuizContentResponse;
 import softeer.team_pineapple_be.domain.quiz.response.QuizInfoResponse;
 import softeer.team_pineapple_be.domain.quiz.service.QuizService;
 import softeer.team_pineapple_be.global.auth.annotation.Auth;
+import softeer.team_pineapple_be.global.common.response.SuccessResponse;
 
 @Tag(name = "Quiz 관련 정보 제공", description = "퀴즈에 대한 처리(내용, 정답)")
 @RestController
@@ -32,6 +34,14 @@ public class QuizController {
     return ResponseEntity.ok().body(quizService.getQuizContent());
   }
 
+  @Auth
+  @Operation(summary = "퀴즈 선착순 경품 받기")
+  @PostMapping("/reward")
+  public ResponseEntity<SuccessResponse> getQuizReward(@RequestBody @Valid QuizRewardRequest quizRewardRequest) {
+    quizService.getQuizReward(quizRewardRequest.getParticipantId());
+    return ResponseEntity.ok(new SuccessResponse());
+  }
+
   @Operation(summary = "퀴즈 정답 맞추기")
   @PostMapping("/answer")
   public ResponseEntity<QuizInfoResponse> isCorrect(@Valid @RequestBody QuizInfoRequest quizInfoRequest) {
@@ -44,5 +54,4 @@ public class QuizController {
   public ResponseEntity<MemberInfoResponse> setQuizHistory() {
     return ResponseEntity.ok().body(quizService.quizHistory());
   }
-
 }
