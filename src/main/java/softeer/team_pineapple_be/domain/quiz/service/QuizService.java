@@ -101,14 +101,34 @@ public class QuizService {
     return MemberInfoResponse.of(member);
   }
 
-    private LocalDate determineQuizDate() {
-        LocalTime onePm = LocalTime.of(13, 0);
-        LocalTime atNoon = LocalTime.of(12, 0);
-        LocalTime now = LocalTime.now();
-        // 현재 시간이 12시 이전인지 확인
-        if (now.isBefore(atNoon)) {
-            return LocalDate.now().minusDays(1);
-        }
+  /**
+   * 퀴즈 정답에 대한 여부를 판단하고 선착순 정보와 내용을 전송해주는 메서드
+   *
+   * @param quizInfoRequest 퀴즈 번호와 사용자가 제출한 정답을 받아오기 위한 객체
+   * @return 정답 안내 정보에 대한 내용
+   */
+  @Transactional
+  public QuizInfoResponse quizIsCorrect(QuizInfoRequest quizInfoRequest) {
+    QuizInfo quizInfo = quizInfoRepository.findById(quizInfoRequest.getQuizId())
+                                          .orElseThrow(() -> new RestApiException(QuizErrorCode.NO_QUIZ_INFO));
+    if (quizInfoRequest.getAnswerNum().equals(quizInfo.getAnswerNum())) {
+      FcfsInfo fcfsInfo = fcfsService.getFirstComeFirstServe();
+      if (fcfsInfo.order() < 1) {
+        return new QuizSuccessInfoResponse(true, quizInfo.getQuizImage(), "NULL", FCFS_FAILED_ORDER);
+      }
+      return new QuizSuccessInfoResponse(true, quizInfo.getQuizImage(), fcfsInfo.uuid(), fcfsInfo.order().intValue());
+    }
+    return QuizInfoResponse.of(quizInfo, false);
+  }
+
+  private LocalDate determineQuizDate() {
+    LocalTime onePm = LocalTime.of(13, 0);
+    LocalTime atNoon = LocalTime.of(12, 0);
+    LocalTime now = LocalTime.now();
+    // 현재 시간이 12시 이전인지 확인
+    if (now.isBefore(atNoon)) {
+      return LocalDate.now().minusDays(1);
+    }
 
     if (now.isBefore(onePm) && now.isAfter(atNoon)) {
       throw new RestApiException(QuizErrorCode.NO_QUIZ_CONTENT);
