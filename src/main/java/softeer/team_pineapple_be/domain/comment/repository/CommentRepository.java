@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import softeer.team_pineapple_be.domain.comment.domain.Comment;
@@ -21,4 +22,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
       "SELECT c FROM Comment c WHERE c.phoneNumber = :phoneNumber AND c.postTime >= :startOfDay AND c.postTime < :endOfDay")
   Optional<Comment> findCommentsByAuthorAndDate(@Param("phoneNumber") String phoneNumber,
       @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+  List<Comment> findTop10CommentsByPostTimeBetweenOrderByLikeCountDescIdAsc(@Param("startOfDay") LocalDateTime startOfDay,
+                                             @Param("endOfDay") LocalDateTime endOfDay);
+
+
+
+
 }
