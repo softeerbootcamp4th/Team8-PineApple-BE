@@ -3,12 +3,15 @@ package softeer.team_pineapple_be.domain.comment.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +56,37 @@ public class CommentService {
         commentRepository.findAllByPostTimeBetween(pageRequest, date.atStartOfDay(), date.atTime(LocalTime.MAX));
     return CommentPageResponse.fromCommentPage(commentPage, likeRedisService);
   }
+
+  @Scheduled(cron = "0 0 0 * * *")
+  @Transactional(isolation= Isolation.DEFAULT)
+  public void test(){
+    LocalDate yesterday = LocalDate.now().minusDays(1);
+    List<Comment> topComments = commentRepository
+            .findTop10CommentsByPostTimeBetweenOrderByLikeCountDescIdAsc(yesterday.atStartOfDay(), yesterday.atTime(LocalTime.MAX));
+
+
+//    List<Member> updatedMembers = new ArrayList<>();
+//
+//    for (Comment comment : topComments) {
+//      String phoneNumber = comment.getPhoneNumber();
+//      Member member = memberRepository.findById(phoneNumber).orElseThrow(() -> new RestApiException(MemberErrorCode.NO_MEMBER)); // 유저 찾기
+//
+//      member.increment10ToolBoxCnt();
+//
+//      updatedMembers.add(member); // 변경된 멤버를 리스트에 추가
+//
+//    }
+//
+//
+//    memberRepository.saveAll(updatedMembers);
+    System.out.println(topComments.size());
+    topComments.stream()
+            .map(Comment::getPhoneNumber)
+            .forEach(phoneNumber -> System.out.println("Top User: " + phoneNumber));
+
+
+  }
+
 
   /**
    * 기대평을 최신순으로 가져오는 메서드
