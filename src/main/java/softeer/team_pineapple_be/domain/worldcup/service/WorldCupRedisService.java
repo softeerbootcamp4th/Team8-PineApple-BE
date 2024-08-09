@@ -29,7 +29,8 @@ public class WorldCupRedisService {
    * @return
    */
   public List<WorldCupResultResponse> getWorldCupResults() {
-    Set<ZSetOperations.TypedTuple<String>> tupleSet = redisTemplate.opsForZSet().rangeWithScores(ANSWER_KEY, 0, -1);
+    Set<ZSetOperations.TypedTuple<String>> tupleSet =
+        redisTemplate.opsForZSet().reverseRangeWithScores(ANSWER_KEY, 0, -1);
     long totalCount = tupleSet.stream().mapToLong(typedTuple -> typedTuple.getScore().longValue()).sum();
     List<WorldCupResultResponse> worldCupResultResponses = new ArrayList<>();
     tupleSet.forEach(typedTuple -> {
