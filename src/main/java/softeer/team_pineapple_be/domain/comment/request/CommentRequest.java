@@ -1,11 +1,12 @@
 package softeer.team_pineapple_be.domain.comment.request;
 
+import org.hibernate.validator.constraints.Length;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 /**
  * 기대평 작성 요청 객체
