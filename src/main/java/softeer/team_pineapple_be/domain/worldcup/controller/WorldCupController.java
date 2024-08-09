@@ -46,7 +46,6 @@ public class WorldCupController {
     return ResponseEntity.ok(new SuccessResponse());
   }
 
-  @Auth
   @Operation(summary = "월드컵 결과 넣기")
   @PostMapping("/results")
   ResponseEntity<SuccessResponse> postResult(@RequestBody @Valid WorldCupResultRequest worldCupResultRequest) {
